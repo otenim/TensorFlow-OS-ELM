@@ -10,9 +10,12 @@ import argparse
 import chainer
 from chainer.dataset import convert
 import chainer.links as L
+import chainer.functions as F
 from chainer import serializers
 import time
 import pickle
+import ime
+import os
 
 # Network definition
 class MLP(chainer.Chain):
@@ -28,6 +31,7 @@ class MLP(chainer.Chain):
         h1 = F.relu(self.l1(x))
         return self.l2(h1)
 
+current_directory = os.path.dirname(os.path.abspath(__file__))
 
 def main():
     parser = argparse.ArgumentParser(description='Chainer example: MNIST')
