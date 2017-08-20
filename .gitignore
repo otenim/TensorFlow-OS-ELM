@@ -1,0 +1,5 @@
+*.dump
+*.jpg
+*.png
+__pycache__
+result/
