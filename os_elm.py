@@ -107,7 +107,7 @@ def main(args):
     # hyper parameters
     units = args.units
     batch_size = args.batch_size
-    init_batch_size = int(units * 1.2)
+    init_batch_size = 59800
     epochs = args.epochs
     inputs = 784
     outputs = 10
@@ -143,6 +143,7 @@ def main(args):
     model.init_train(x_train_init, y_train_init)
 
     # sequential training phase
+    """
     print("=====> sequential training phase")
     n_train_seq = len(x_train_seq)
     n_test = len(x_test)
@@ -182,8 +183,15 @@ def main(args):
         plot_val_loss.append(val_loss)
         plot_val_acc.append(val_acc)
         plot_durations.append(duration)
+    """
+    # final evaluation
+    print("=====> final evaluation...")
+    val_loss, val_acc = model.eval(x_test, y_test)
+    print("validation loss: %f" % (val_loss))
+    print("validation accuracy: %f%%" % (val_acc))
 
     # save plot data as pickle file
+    """
     print("=====> saveing plot data...")
     plot = {
         'loss': plot_loss,
@@ -195,6 +203,7 @@ def main(args):
     filename = 'oselm_batch' + str(batch_size) + '_epochs' + str(epochs) + '.dump'
     with open(os.path.join(current_directory, filename), 'wb') as f:
         pickle.dump(plot, f)
+    """
 
 if __name__ == '__main__':
     args = parser.parse_args()
