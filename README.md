@@ -9,7 +9,7 @@
 
 ### MNIST
 
-#### Batch size: 8
+#### Batch size: 32
 <table>
     <tr>
         <th>Hidden units</th>
@@ -18,14 +18,12 @@
         <th>val loss</th>
     </tr>
     <tr>
-        <td>128</td>
-        <td>4.91e-3</td>
-        <td>82.91</td>
-        <td>0.22</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
     </tr>
 </table>
-#### Batch size: 16
-#### Batch size: 32
 #### Batch size: 64
 #### Batch size: 128
 #### Batch size: 256
