@@ -2,6 +2,5 @@
 *.jpg
 *.png
 *.out
-eval_mnist.sh
 __pycache__
 result/
