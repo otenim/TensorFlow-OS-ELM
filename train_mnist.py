@@ -22,6 +22,10 @@ parser.add_argument(
     type=int,
     default=128,
 )
+parser.add_argument(
+    '--result_root',
+    default=os.path.join(current_directory, 'result', 'mnist'),
+)
 
 def main(args):
 
@@ -30,8 +34,17 @@ def main(args):
     batch_size = args.batch_size
     init_batch_size = int(args.units * 1.2)
     epochs = args.epochs
+    result_root = os.path.abspath(args.result_root)
     inputs = 784
     outputs = 10
+    print("/*========== Info ==========*/")
+    print("inputs: %d" % inputs)
+    print("units: %d" % units)
+    print("outputs: %d" % outputs)
+    print("batch_size: %d" % batch_size)
+    print("init_batch_size: %d" % init_batch_size)
+    print("epochs: %d" % epochs)
+    print("result_root: %s" % result_root)
 
     # prepare datasets
     print("preparing dataset...")
@@ -111,6 +124,19 @@ def main(args):
     print("mean training accuracy: %f%%" % (sum_acc / epochs))
     print("mean validation loss: %f" % (sum_val_loss / epochs))
     print("mean validation accuracy: %f%%" % (sum_val_acc / epochs))
+
+    # write result
+    if os.path.exists(result_root) == False:
+        os.makedirs(result_root)
+    fname = "batchsize%d_units%d.out" % (batch_size, units)
+    with open(os.path.join(result_root, fname), 'w') as f:
+        f.write("/*========== FINAL RESULT ==========*/\n")
+        f.write("mean single training time: %f[sec]\n" % (sum_single_training_time / epochs))
+        f.write("mean training loss: %f\n" % (sum_loss / epochs))
+        f.write("mean training accuracy: %f%%\n" % (sum_acc / epochs))
+        f.write("mean validation loss: %f\n" % (sum_val_loss / epochs))
+        f.write("mean validation accuracy: %f%%\n" % (sum_val_acc / epochs))
+
 
 if __name__ == '__main__':
     args = parser.parse_args()
