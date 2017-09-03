@@ -142,7 +142,7 @@ def main(args):
         f.write("mean training accuracy: %f%%\n" % (sum_acc / epochs))
         f.write("mean validation loss(MSE): %f\n" % (sum_val_loss / epochs))
         f.write("mean validation accuracy: %f%%\n" % (sum_val_acc / epochs))
-        f.write("/*========== HTML code for this record ==========*/")
+        f.write("/*========== HTML code for this record ==========*/\n")
         f.write("| units | time | val_loss | val_acc |\n")
         f.write("<tr>\n")
         f.write("\t<td>%d</td>\n" % (units))

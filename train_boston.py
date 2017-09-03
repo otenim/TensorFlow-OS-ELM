@@ -130,6 +130,13 @@ def main(args):
         f.write("mean single training time: %f[sec]\n" % (sum_single_training_time / epochs))
         f.write("mean training loss: %f\n" % (sum_loss / epochs))
         f.write("mean validation loss: %f\n" % (sum_val_loss / epochs))
+        f.write("/*========== HTML code for this record ==========*/\n")
+        f.write("| units | time | val_loss |\n")
+        f.write("<tr>\n")
+        f.write("\t<td>%d</td>\n" % (units))
+        f.write("\t<td>%f</td>\n" % (sum_single_training_time / epochs))
+        f.write("\t<td>%f</td>\n" % (sum_val_loss / epochs))
+        f.write("</tr>\n")
 
 
 if __name__ == '__main__':
