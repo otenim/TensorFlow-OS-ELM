@@ -1,5 +1,5 @@
 import argparse
-import chainer
+from keras.datasets import boston_housing
 import numpy as np
 import os
 import time
@@ -20,12 +20,19 @@ parser.add_argument(
 parser.add_argument(
     '--units',
     type=int,
-    default=128,
+    default=64,
 )
 parser.add_argument(
     '--result_root',
-    default=os.path.join(current_directory, 'result', 'mnist'),
+    default=os.path.join(current_directory, 'result', 'boston'),
 )
+
+# normalize dataset into [0,1]
+def normalize_dataset(dataset):
+    max_value = np.max(dataset, axis=0)
+    min_value = np.min(dataset, axis=0)
+    normalized = (dataset - min_value) / (max_value - min_value)
+    return normalized
 
 def main(args):
 
@@ -35,8 +42,8 @@ def main(args):
     init_batch_size = int(args.units * 1.2)
     epochs = args.epochs
     result_root = os.path.abspath(args.result_root)
-    inputs = 784
-    outputs = 10
+    inputs = 13
+    outputs = 1
     print("/*========== Info ==========*/")
     print("inputs: %d" % inputs)
     print("units: %d" % units)
@@ -48,13 +55,13 @@ def main(args):
 
     # prepare datasets
     print("preparing dataset...")
-    train, test = chainer.datasets.get_mnist()
-    x_train, y_train = train._datasets[0], train._datasets[1]
-    x_test, y_test = test._datasets[0], test._datasets[1]
+    (x_train, y_train), (x_test, y_test) = boston_housing.load_data()
 
-    # translate labels into one-hot vectors
-    y_test = np.eye(outputs)[y_test]
-    y_train = np.eye(outputs)[y_train]
+    # normalize dataset into [0,1]
+    x_train = normalize_dataset(x_train)
+    y_train = normalize_dataset(y_train)
+    x_test = normalize_dataset(x_test)
+    y_test = normalize_dataset(y_test)
 
     # separate training data into two groups
     # (for initial training and for sequential training)
@@ -64,8 +71,8 @@ def main(args):
     y_train_seq = y_train[init_batch_size:]
 
     # Experiment Loop
-    sum_loss, sum_acc = 0., 0.
-    sum_val_loss, sum_val_acc = 0., 0.
+    sum_loss = 0.
+    sum_val_loss = 0.
     sum_single_training_time = 0.
 
     for epoch in range(epochs):
@@ -104,26 +111,21 @@ def main(args):
         sum_single_training_time += (single_training_time / cnt)
         print("single training time: %f[sec]" % (single_training_time / cnt))
 
-        # evaluation
-        loss, acc = model.eval(x_train_seq[:n_test], y_train_seq[:n_test])
+        # evaluation(training)
+        loss = model.eval(x_train_seq[:n_test], y_train_seq[:n_test], mode='regress')
         print("training loss(MSE): %f" % (loss))
-        print("training accuracy: %f%%" % (acc))
         sum_loss += loss
-        sum_acc += acc
 
-        val_loss, val_acc = model.eval(x_test, y_test)
+        # evaluation(validation)
+        val_loss = model.eval(x_test, y_test, mode='regress')
         print("validation loss(MSE): %f" % (val_loss))
-        print("validation accuracy: %f%%" % (val_acc))
         sum_val_loss += val_loss
-        sum_val_acc += val_acc
 
     # final evaluation
     print("/*========== FINAL RESULT ==========*/")
     print("mean single training time: %f[sec]" % (sum_single_training_time / epochs))
-    print("mean training loss(MSE): %f" % (sum_loss / epochs))
-    print("mean training accuracy: %f%%" % (sum_acc / epochs))
-    print("mean validation loss(MSE): %f" % (sum_val_loss / epochs))
-    print("mean validation accuracy: %f%%" % (sum_val_acc / epochs))
+    print("mean training loss: %f" % (sum_loss / epochs))
+    print("mean validation loss: %f" % (sum_val_loss / epochs))
 
     # write result
     if os.path.exists(result_root) == False:
@@ -132,10 +134,8 @@ def main(args):
     with open(os.path.join(result_root, fname), 'w') as f:
         f.write("/*========== FINAL RESULT ==========*/\n")
         f.write("mean single training time: %f[sec]\n" % (sum_single_training_time / epochs))
-        f.write("mean training loss(MSE): %f\n" % (sum_loss / epochs))
-        f.write("mean training accuracy: %f%%\n" % (sum_acc / epochs))
-        f.write("mean validation loss(MSE): %f\n" % (sum_val_loss / epochs))
-        f.write("mean validation accuracy: %f%%\n" % (sum_val_acc / epochs))
+        f.write("mean training loss: %f\n" % (sum_loss / epochs))
+        f.write("mean validation loss: %f\n" % (sum_val_loss / epochs))
 
 
 if __name__ == '__main__':

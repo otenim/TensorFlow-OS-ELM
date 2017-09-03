@@ -3,10 +3,6 @@ import numpy as np
 # Network definition
 class OS_ELM(object):
 
-    def _categorical_cross_entropy_error(self, out, y):
-        batch_size = len(out)
-        return -np.sum(y * np.log(out + 1.0e-7)) / batch_size
-
     def _mean_squared_error(self, out, y):
         batch_size = len(out)
         return 0.5 * np.sum((out - y)**2) / batch_size
@@ -45,15 +41,17 @@ class OS_ELM(object):
         h2 = a1.dot(self.beta)
         return h2
 
-    def eval(self, x, y):
+    def eval(self, x, y, mode='classify'):
         out = self(x)
         loss = self._mean_squared_error(out, y)
-        accuracy = self._accuracy(out, y)
-        return  loss, accuracy
+        if mode == 'classify':
+            accuracy = self._accuracy(out, y)
+            return loss, accuracy
+        elif mode == 'regress':
+            return loss
+        else:
+            raise Exception('unnexpected mode [%s] was entered.' % mode)
 
-    def predict(self, x):
-        out = self(x)
-        return np.argmax(out, axis=1)
 
     def init_train(self, x0, y0):
         assert self.is_init_phase, 'initial training phase was over. use [seq_train] instead of [init_train]'
