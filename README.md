@@ -14,16 +14,13 @@
     <tr>
         <th>Hidden units</th>
         <th>time [sec]</th>
-        <th>val acc [%]</th>
         <th>val loss</th>
-    </tr>
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <th>val acc [%]</th>
     </tr>
 </table>
+
 #### Batch size: 64
+
 #### Batch size: 128
+
 #### Batch size: 256

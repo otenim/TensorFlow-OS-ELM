@@ -16,7 +16,7 @@ parser.add_argument(
 parser.add_argument(
     '--epochs',
     type=int,
-    default=10,
+    default=20,
 )
 parser.add_argument(
     '--units',
@@ -142,6 +142,14 @@ def main(args):
         f.write("mean training accuracy: %f%%\n" % (sum_acc / epochs))
         f.write("mean validation loss(MSE): %f\n" % (sum_val_loss / epochs))
         f.write("mean validation accuracy: %f%%\n" % (sum_val_acc / epochs))
+        f.write("/*========== HTML code for this record ==========*/")
+        f.write("| units | time | val_loss | val_acc |\n")
+        f.write("<tr>\n")
+        f.write("\t<td>%d</td>\n" % (units))
+        f.write("\t<td>%f</td>\n" % (sum_single_training_time / epochs))
+        f.write("\t<td>%f</td>\n" % (sum_val_loss / epochs))
+        f.write("\t<td>%f</td>\n" % (sum_val_acc / epochs))
+        f.write("</tr>\n")
 
 
 if __name__ == '__main__':
