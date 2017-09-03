@@ -1,9 +1,10 @@
 import argparse
-import chainer
+from sklearn.datasets import load_digits
 import numpy as np
 import os
 import time
 from os_elm import OS_ELM
+from utils import normalize_dataset
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser()
@@ -24,7 +25,7 @@ parser.add_argument(
 )
 parser.add_argument(
     '--result_root',
-    default=os.path.join(current_directory, 'result', 'mnist'),
+    default=os.path.join(current_directory, 'result', 'digits'),
 )
 
 def main(args):
@@ -35,7 +36,7 @@ def main(args):
     init_batch_size = int(args.units * 1.2)
     epochs = args.epochs
     result_root = os.path.abspath(args.result_root)
-    inputs = 784
+    inputs = 64
     outputs = 10
     print("/*========== Info ==========*/")
     print("inputs: %d" % inputs)
@@ -48,9 +49,14 @@ def main(args):
 
     # prepare datasets
     print("preparing dataset...")
-    train, test = chainer.datasets.get_mnist()
-    x_train, y_train = train._datasets[0], train._datasets[1]
-    x_test, y_test = test._datasets[0], test._datasets[1]
+    x, y = load_digits().data, load_digits().target
+    split = int(len(x) * 0.8)
+    x_train, x_test = x[:split], x[split:]
+    y_train, y_test = y[:split], y[split:]
+
+    # normalize input dataset into [0,1.0]
+    x_train = normalize_dataset(x_train, axis=None)
+    x_test = normalize_dataset(x_test, axis=None)
 
     # translate labels into one-hot vectors
     y_test = np.eye(outputs)[y_test]
