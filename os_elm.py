@@ -29,8 +29,8 @@ class OS_ELM(object):
         self.units = units
         self.outputs = outputs
         self.alpha = np.random.rand(inputs, units) * 2.0 - 1.0 # [-1.0, 1.0]
-        self.beta = np.random.rand(units, outputs) * 2.0 - 1.0
-        self.bias = np.random.rand(1, units) * 2.0 - 1.0
+        self.beta = np.random.rand(units, outputs) * 2.0 - 1.0 # [-1.0, 1.0]
+        self.bias = np.zeros((1, units))
         self.P = None
         self.is_init_phase = True
         self.is_seq_phase = False
