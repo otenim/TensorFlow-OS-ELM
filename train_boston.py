@@ -16,7 +16,7 @@ parser.add_argument(
 parser.add_argument(
     '--epochs',
     type=int,
-    default=20,
+    default=50,
 )
 parser.add_argument(
     '--units',
