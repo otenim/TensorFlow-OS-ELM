@@ -9,6 +9,11 @@
 
 ### MNIST
 
+* input features: 784
+* output features: 10
+* training images: 60000
+* validation images: 10000
+
 #### Batch size: 32
 <table>
     <tr>
@@ -178,3 +183,257 @@
         <td>93.629000</td>
 </tr>
 </table>
+
+### Digits
+
+* input features: 64
+* output features: 10
+* training images: 1437
+* validation images: 360
+
+#### Batch size: 8
+<table>
+<tr>
+    <th>Hidden units</th>
+    <th>time [sec]</th>
+    <th>val loss</th>
+    <th>val acc [%]</th>
+</tr>
+<tr>
+        <td>64</td>
+        <td>0.000309</td>
+        <td>0.179802</td>
+        <td>87.750000</td>
+</tr>
+<tr>
+        <td>128</td>
+        <td>0.000627</td>
+        <td>0.140495</td>
+        <td>91.527778</td>
+</tr>
+<tr>
+        <td>256</td>
+        <td>0.001634</td>
+        <td>0.113753</td>
+        <td>93.850000</td>
+</tr>
+<tr>
+        <td>512</td>
+        <td>0.005928</td>
+        <td>0.100869</td>
+        <td>94.833333</td>
+</tr>
+<tr>
+        <td>1024</td>
+        <td>0.029787</td>
+        <td>0.140027</td>
+        <td>94.233333</td>
+</tr>
+</table>
+
+#### Batch size: 16
+<table>
+<tr>
+    <th>Hidden units</th>
+    <th>time [sec]</th>
+    <th>val loss</th>
+    <th>val acc [%]</th>
+</tr>
+<tr>
+        <td>64</td>
+        <td>0.000608</td>
+        <td>0.181048</td>
+        <td>87.588889</td>
+</tr>
+<tr>
+        <td>128</td>
+        <td>0.001061</td>
+        <td>0.140012</td>
+        <td>91.105556</td>
+</tr>
+<tr>
+        <td>256</td>
+        <td>0.002227</td>
+        <td>0.113563</td>
+        <td>93.855556</td>
+</tr>
+<tr>
+        <td>512</td>
+        <td>0.007483</td>
+        <td>0.101347</td>
+        <td>94.900000</td>
+</tr>
+<tr>
+        <td>1024</td>
+        <td>0.033968</td>
+        <td>0.140204</td>
+        <td>93.905556</td>
+</tr>
+</table>
+
+#### Batch size: 32
+<table>
+<tr>
+    <th>Hidden units</th>
+    <th>time [sec]</th>
+    <th>val loss</th>
+    <th>val acc [%]</th>
+</tr>
+<tr>
+        <td>64</td>
+        <td>0.001269</td>
+        <td>0.180502</td>
+        <td>87.522222</td>
+</tr>
+<tr>
+        <td>128</td>
+        <td>0.001865</td>
+        <td>0.140594</td>
+        <td>91.233333</td>
+</tr>
+<tr>
+        <td>256</td>
+        <td>0.003250</td>
+        <td>0.114752</td>
+        <td>93.600000</td>
+</tr>
+<tr>
+        <td>512</td>
+        <td>0.009370</td>
+        <td>0.100424</td>
+        <td>95.005556</td>
+</tr>
+<tr>
+        <td>1024</td>
+        <td>0.039985</td>
+        <td>0.140275</td>
+        <td>94.116667</td>
+</tr>
+</table>
+
+#### Batch size: 64
+<table>
+<tr>
+    <th>Hidden units</th>
+    <th>time [sec]</th>
+    <th>val loss</th>
+    <th>val acc [%]</th>
+</tr>
+<tr>
+        <td>64</td>
+        <td>0.003376</td>
+        <td>0.181260</td>
+        <td>87.433333</td>
+</tr>
+<tr>
+        <td>128</td>
+        <td>0.004053</td>
+        <td>0.143445</td>
+        <td>91.122222</td>
+</tr>
+<tr>
+        <td>256</td>
+        <td>0.005623</td>
+        <td>0.113962</td>
+        <td>93.527778</td>
+</tr>
+<tr>
+        <td>512</td>
+        <td>0.011173</td>
+        <td>0.100105</td>
+        <td>95.133333</td>
+</tr>
+<tr>
+        <td>1024</td>
+        <td>0.038069</td>
+        <td>0.139524</td>
+        <td>94.083333</td>
+</tr>
+</table>
+
+#### Batch size: 128
+<table>
+<tr>
+    <th>Hidden units</th>
+    <th>time [sec]</th>
+    <th>val loss</th>
+    <th>val acc [%]</th>
+</tr>
+<tr>
+        <td>64</td>
+        <td>0.008676</td>
+        <td>0.179460</td>
+        <td>87.566667</td>
+</tr>
+<tr>
+        <td>128</td>
+        <td>0.011528</td>
+        <td>0.142623</td>
+        <td>91.177778</td>
+</tr>
+<tr>
+        <td>256</td>
+        <td>0.014602</td>
+        <td>0.114893</td>
+        <td>93.683333</td>
+</tr>
+<tr>
+        <td>512</td>
+        <td>0.019343</td>
+        <td>0.100079</td>
+        <td>95.116667</td>
+</tr>
+<tr>
+        <td>1024</td>
+        <td>0.052509</td>
+        <td>0.139227</td>
+        <td>94.272222</td>
+</tr>
+</table>
+
+#### Batch size: 256
+<table>
+<tr>
+    <th>Hidden units</th>
+    <th>time [sec]</th>
+    <th>val loss</th>
+    <th>val acc [%]</th>
+</tr>
+<tr>
+        <td>64</td>
+        <td>0.024384</td>
+        <td>0.178305</td>
+        <td>87.911111</td>
+</tr>
+<tr>
+        <td>128</td>
+        <td>0.028062</td>
+        <td>0.141705</td>
+        <td>91.127778</td>
+</tr>
+<tr>
+        <td>256</td>
+        <td>0.040147</td>
+        <td>0.114101</td>
+        <td>93.661111</td>
+</tr>
+<tr>
+        <td>512</td>
+        <td>0.045700</td>
+        <td>0.101385</td>
+        <td>95.011111</td>
+</tr>
+<tr>
+        <td>1024</td>
+        <td>0.074501</td>
+        <td>0.140002</td>
+        <td>94.283333</td>
+</tr>
+</table>
+
+### Boston
+
+* input features: 64
+* output features: 10
+* training images: 404
+* validation images: 102
