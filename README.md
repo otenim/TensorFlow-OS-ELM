@@ -18,6 +18,7 @@
 
 * Batch size: 64
 * Hidden unit: 1024
+* val acc: 93.705%
 
 
 #### Batch size: 32
@@ -201,6 +202,7 @@
 
 * Batch size: 64
 * Hidden units: 512
+* val acc: 95.13%
 
 #### Batch size: 8
 <table>
@@ -453,6 +455,7 @@
 
 * Batch size: 4
 * Hidden units: 16
+* val loss: 0.009228
 
 #### Batch size: 4
 <table>
