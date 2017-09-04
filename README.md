@@ -437,3 +437,174 @@
 * output features: 10
 * training images: 404
 * validation images: 102
+
+#### Batch size: 4
+<table>
+<tr>
+    <th>Hidden units</th>
+    <th>time [sec]</th>
+    <th>val loss</th>
+</tr>
+<tr>
+        <td>8</td>
+        <td>0.000078</td>
+        <td>0.010738</td>
+</tr>
+<tr>
+        <td>16</td>
+        <td>0.000083</td>
+        <td>0.009228</td>
+</tr>
+<tr>
+        <td>32</td>
+        <td>0.000105</td>
+        <td>0.010682</td>
+</tr>
+<tr>
+        <td>64</td>
+        <td>0.000195</td>
+        <td>0.011566</td>
+</tr>
+<tr>
+        <td>128</td>
+        <td>0.000599</td>
+        <td>0.015179</td>
+</tr>
+</table>
+
+#### Batch size: 8
+<table>
+<tr>
+    <th>Hidden units</th>
+    <th>time [sec]</th>
+    <th>val loss</th>
+</tr>
+<tr>
+        <td>8</td>
+        <td>0.000116</td>
+        <td>0.010738</td>
+</tr>
+<tr>
+        <td>16</td>
+        <td>0.000118</td>
+        <td>0.009228</td>
+</tr>
+<tr>
+        <td>32</td>
+        <td>0.000138</td>
+        <td>0.010682</td>
+</tr>
+<tr>
+        <td>64</td>
+        <td>0.000262</td>
+        <td>0.011566</td>
+</tr>
+<tr>
+        <td>128</td>
+        <td>0.000640</td>
+        <td>0.015179</td>
+</tr>
+
+</table>
+
+#### Batch size: 16
+<table>
+<tr>
+    <th>Hidden units</th>
+    <th>time [sec]</th>
+    <th>val loss</th>
+</tr>
+<tr>
+        <td>8</td>
+        <td>0.000161</td>
+        <td>0.010738</td>
+</tr>
+<tr>
+        <td>16</td>
+        <td>0.000250</td>
+        <td>0.009228</td>
+</tr>
+<tr>
+        <td>32</td>
+        <td>0.000289</td>
+        <td>0.010682</td>
+</tr>
+<tr>
+        <td>64</td>
+        <td>0.000448</td>
+        <td>0.011566</td>
+</tr>
+<tr>
+        <td>128</td>
+        <td>0.000864</td>
+        <td>0.015179</td>
+</tr>
+</table>
+
+#### Batch size: 32
+<table>
+<tr>
+    <th>Hidden units</th>
+    <th>time [sec]</th>
+    <th>val loss</th>
+</tr>
+<tr>
+        <td>8</td>
+        <td>0.000257</td>
+        <td>0.010738</td>
+</tr>
+<tr>
+        <td>16</td>
+        <td>0.000390</td>
+        <td>0.009228</td>
+</tr>
+<tr>
+        <td>32</td>
+        <td>0.000597</td>
+        <td>0.010682</td>
+</tr>
+<tr>
+        <td>64</td>
+        <td>0.001074</td>
+        <td>0.011566</td>
+</tr>
+<tr>
+        <td>128</td>
+        <td>0.001506</td>
+        <td>0.015179</td>
+</tr>
+</table>
+
+#### Batch size: 64
+<table>
+<tr>
+    <th>Hidden units</th>
+    <th>time [sec]</th>
+    <th>val loss</th>
+</tr>
+<tr>
+        <td>8</td>
+        <td>0.001130</td>
+        <td>0.010738</td>
+</tr>
+<tr>
+        <td>16</td>
+        <td>0.001287</td>
+        <td>0.009228</td>
+</tr>
+<tr>
+        <td>32</td>
+        <td>0.002012</td>
+        <td>0.010682</td>
+</tr>
+<tr>
+        <td>64</td>
+        <td>0.002544</td>
+        <td>0.011566</td>
+</tr>
+<tr>
+        <td>128</td>
+        <td>0.003602</td>
+        <td>0.015179</td>
+</tr>
+</table>
