@@ -14,6 +14,12 @@
 * training images: 60000
 * validation images: 10000
 
+**Best setting(val acc)**
+
+* Batch size: 64
+* Hidden unit: 1024
+
+
 #### Batch size: 32
 <table>
     <tr>
@@ -190,6 +196,11 @@
 * output features: 10
 * training images: 1437
 * validation images: 360
+
+**Best setting(val acc)**
+
+* Batch size: 64
+* Hidden units: 512
 
 #### Batch size: 8
 <table>
@@ -437,6 +448,11 @@
 * output features: 10
 * training images: 404
 * validation images: 102
+
+**Best Setting(val loss)**
+
+* Batch size: 4
+* Hidden units: 16
 
 #### Batch size: 4
 <table>
