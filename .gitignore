@@ -4,3 +4,4 @@
 *.out
 __pycache__
 result/
+weights/

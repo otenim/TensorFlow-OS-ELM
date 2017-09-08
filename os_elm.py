@@ -75,3 +75,19 @@ class OS_ELM(object):
 
         # update beta
         self.beta = self.beta + (self.P.dot(HT).dot(y - H.dot(self.beta)))
+
+    def dump_beta(self, path):
+        with open(path, 'w') as f:
+            row, col = self.beta.shape
+            for i in range(row):
+                for j in range(col):
+                    f.write('%f ' % (self.beta[i][j]))
+                f.write('\n')
+
+    def dump_alpha(self, path):
+        with open(path, 'w') as f:
+            row, col = self.alpha.shape
+            for i in range(row):
+                for j in range(col):
+                    f.write('%f ' % (self.alpha[i][j]))
+                f.write('\n')

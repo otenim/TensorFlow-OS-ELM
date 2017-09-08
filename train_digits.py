@@ -27,6 +27,15 @@ parser.add_argument(
     '--result_root',
     default=os.path.join(current_directory, 'result', 'digits'),
 )
+parser.add_argument(
+    '--save_weights',
+    type=bool,
+    default=False,
+)
+parser.add_argument(
+    '--weights_root',
+    default=os.path.join(current_directory, 'weights', 'digits'),
+)
 
 def main(args):
 
@@ -36,6 +45,7 @@ def main(args):
     init_batch_size = int(args.units * 1.2)
     epochs = args.epochs
     result_root = os.path.abspath(args.result_root)
+    weights_root = os.path.abspath(args.weights_root)
     inputs = 64
     outputs = 10
     print("/*========== Info ==========*/")
@@ -150,6 +160,16 @@ def main(args):
         f.write("\t<td>%f</td>\n" % (sum_val_loss / epochs))
         f.write("\t<td>%f</td>\n" % (sum_val_acc / epochs))
         f.write("</tr>\n")
+
+    # save weights
+    if args.save_weights:
+        fname_alpha = "batchsize%d_units%d.alpha" % (batch_size, units)
+        fname_beta = "batchsize%d_units%d.beta" % (batch_size, units)
+        if os.path.exists(weights_root) == False:
+            os.makedirs(weights_root)
+        model.dump_beta(os.path.join(weights_root, fname_beta))
+        model.dump_alpha(os.path.join(weights_root, fname_alpha))
+
 
 
 if __name__ == '__main__':
