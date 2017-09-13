@@ -165,9 +165,11 @@ def main(args):
     if args.save_weights:
         fname_alpha = "batchsize%d_units%d.alpha" % (batch_size, units)
         fname_beta = "batchsize%d_units%d.beta" % (batch_size, units)
+        fname_beta_init = "batchsize%d_units%d.beta_init" % (batch_size, units)
         if os.path.exists(weights_root) == False:
             os.makedirs(weights_root)
         model.dump_beta(os.path.join(weights_root, fname_beta))
+        model.dump_beta_init(os.path.join(weights_root, fname_beta_init))
         model.dump_alpha(os.path.join(weights_root, fname_alpha))
 
 
