@@ -33,6 +33,7 @@ class OS_ELM(object):
         self.beta_init = np.random.rand(units, outputs) * 2.0 - 1.0
         self.bias = np.zeros((1, units))
         self.P = None
+        self.P_init = None
         self.is_init_phase = True
         self.is_seq_phase = False
 
@@ -60,6 +61,7 @@ class OS_ELM(object):
         H0 = self._sigmoid(x0.dot(self.alpha) + self.bias)
         H0T = H0.T
         self.P = np.linalg.pinv(H0T.dot(H0))
+        self.P_init = np.copy(self.P)
         self.beta = self.P.dot(H0T).dot(y0)
         self.beta_init = np.copy(self.beta)
         self.is_init_phase = False
@@ -92,6 +94,14 @@ class OS_ELM(object):
             for i in range(row):
                 for j in range(col):
                     f.write('%f ' % (self.beta_init[i][j]))
+                f.write('\n')
+
+    def dump_P_init(self, path):
+        with open(path, 'w') as f:
+            row, col = self.P_init.shape
+            for i in range(row):
+                for j in range(col):
+                    f.write('%f ' % (self.P_init[i][j]))
                 f.write('\n')
 
     def dump_alpha(self, path):
