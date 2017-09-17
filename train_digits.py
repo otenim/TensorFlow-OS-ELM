@@ -5,6 +5,7 @@ import os
 import time
 from os_elm import OS_ELM
 from utils import normalize_dataset
+from utils import dump_dataset
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser()
@@ -31,6 +32,15 @@ parser.add_argument(
     '--save_weights',
     type=bool,
     default=False,
+)
+parser.add_argument(
+    '--dump_dataset',
+    type=bool,
+    default=False,
+)
+parser.add_argument(
+    '--dataset_root',
+    default=os.path.join(current_directory, 'dataset', 'digits')
 )
 parser.add_argument(
     '--weights_root',
@@ -71,6 +81,15 @@ def main(args):
     # translate labels into one-hot vectors
     y_test = np.eye(outputs)[y_test]
     y_train = np.eye(outputs)[y_train]
+
+    # dump dataset
+    if args.dump_dataset:
+        root = os.path.abspath(args.dataset_root)
+        dump_dataset(os.path.join(root, 'x_train_digits.dat'), x_train)
+        dump_dataset(os.path.join(root, 'x_test_digits.dat'), x_test)
+        dump_dataset(os.path.join(root, 'y_train_digits.dat'), y_train)
+        dump_dataset(os.path.join(root, 'y_test_digits.dat'), y_test)
+
 
     # separate training data into two groups
     # (for initial training and for sequential training)
