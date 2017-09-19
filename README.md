@@ -19,7 +19,7 @@
 * Batch size: 64
 * Hidden unit: 1024
 * val acc: 93.705%
-* time: 0.042997sec
+* time: 0.042997sec (time per a mini batch learning)
 
 #### Batch size: 32
 <table>
