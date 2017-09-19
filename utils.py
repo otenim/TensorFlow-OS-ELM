@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 # normalize dataset into [0, 1.0] along with given axis
 def normalize_dataset(dataset, axis=None):

@@ -40,7 +40,7 @@ parser.add_argument(
 )
 parser.add_argument(
     '--dataset_root',
-    default=os.path.join(current_directory, 'dataset', 'digits')
+    default=os.path.join(current_directory, 'datasets', 'digits')
 )
 parser.add_argument(
     '--weights_root',
