@@ -5,7 +5,7 @@ import os
 import time
 from os_elm import OS_ELM
 from utils import normalize_dataset
-from utils import dump_dataset
+from utils import dump_dataset, dump_matrix
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser()
@@ -85,10 +85,11 @@ def main(args):
     # dump dataset
     if args.dump_dataset:
         root = os.path.abspath(args.dataset_root)
-        dump_dataset(os.path.join(root, 'x_train_digits.dat'), x_train)
-        dump_dataset(os.path.join(root, 'x_test_digits.dat'), x_test)
-        dump_dataset(os.path.join(root, 'y_train_digits.dat'), y_train)
-        dump_dataset(os.path.join(root, 'y_test_digits.dat'), y_test)
+        dump_matrix(os.path.join(root, 'x_train_digits.dat'), x_train)
+        dump_matrix(os.path.join(root, 'x_test_digits.dat'), x_test)
+        dump_matrix(os.path.join(root, 'y_train_digits.dat'), y_train)
+        dump_matrix(os.path.join(root, 'y_test_digits.dat'), y_test)
+
 
 
     # separate training data into two groups
@@ -182,16 +183,15 @@ def main(args):
 
     # save weights
     if args.save_weights:
-        fname_alpha = "batchsize%d_units%d.alpha" % (batch_size, units)
-        fname_beta = "batchsize%d_units%d.beta" % (batch_size, units)
-        fname_beta_init = "batchsize%d_units%d.beta_init" % (batch_size, units)
-        fname_P_init = "batchsize%d_units%d.P_init" % (batch_size, units)
         if os.path.exists(weights_root) == False:
             os.makedirs(weights_root)
-        model.dump_beta(os.path.join(weights_root, fname_beta))
-        model.dump_beta_init(os.path.join(weights_root, fname_beta_init))
-        model.dump_P_init(os.path.join(weights_root, fname_P_init))
-        model.dump_alpha(os.path.join(weights_root, fname_alpha))
+        dump_matrix(os.path.join(weights_root, 'batchsize%d_units%d.beta' % (batch_size, units)), model.beta)
+        dump_matrix(os.path.join(weights_root, 'batchsize%d_units%d.beta_init' % (batch_size, units)), model.beta_init)
+        dump_matrix(os.path.join(weights_root, 'batchsize%d_units%d.beta_rand' % (batch_size, units)), model.beta_rand)
+        dump_matrix(os.path.join(weights_root, 'batchsize%d_units%d.alpha' % (batch_size, units)), model.alpha)
+        dump_matrix(os.path.join(weights_root, 'batchsize%d_units%d.alpha_rand' % (batch_size, units)), model.alpha_rand)
+        dump_matrix(os.path.join(weights_root, 'batchsize%d_units%d.p' % (batch_size, units)), model.p)
+        dump_matrix(os.path.join(weights_root, 'batchsize%d_units%d.p_init' % (batch_size, units)), model.p_init)
 
 
 

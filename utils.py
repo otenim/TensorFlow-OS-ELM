@@ -21,4 +21,18 @@ def dump_dataset(path, dataset):
             for i in range(len(dataset)):
                 f.write('%f\n' % dataset[i])
         else:
-            Exception('Dimension of the input array must be 1 or 2')
+            raise Exception('Dimension of the input array must be 1 or 2')
+
+def dump_matrix(path, matrix):
+    dim = len(matrix.shape)
+    with open(path, 'w') as f:
+        if dim == 2:
+            for i in range(matrix.shape[0]):
+                for j in range(matrix.shape[1]):
+                    f.write('%f ' % matrix[i][j])
+                f.write('\n')
+        elif dim == 1:
+            for i in range(matrix.shape[0]):
+                f.write('%f\n' % matrix[i])
+        else:
+            raise Exception('Dimension of the input matrix must be 1 or 2')

@@ -29,11 +29,13 @@ class OS_ELM(object):
         self.units = units
         self.outputs = outputs
         self.alpha = np.random.rand(inputs, units) * 2.0 - 1.0 # [-1.0, 1.0]
+        self.alpha_rand = np.copy(self.alpha)
         self.beta = np.random.rand(units, outputs) * 2.0 - 1.0 # [-1.0, 1.0]
+        self.beta_rand = np.copy(self.beta)
         self.beta_init = np.random.rand(units, outputs) * 2.0 - 1.0
         self.bias = np.zeros((1, units))
-        self.P = None
-        self.P_init = None
+        self.p = None
+        self.p_init = None
         self.is_init_phase = True
         self.is_seq_phase = False
 
@@ -60,9 +62,9 @@ class OS_ELM(object):
         assert len(x0) >= self.units, 'initial dataset length must be >= %d' % (self.units)
         H0 = self._sigmoid(x0.dot(self.alpha) + self.bias)
         H0T = H0.T
-        self.P = np.linalg.pinv(H0T.dot(H0))
-        self.P_init = np.copy(self.P)
-        self.beta = self.P.dot(H0T).dot(y0)
+        self.p = np.linalg.pinv(H0T.dot(H0))
+        self.p_init = np.copy(self.p)
+        self.beta = self.p.dot(H0T).dot(y0)
         self.beta_init = np.copy(self.beta)
         self.is_init_phase = False
         self.is_seq_phase = True
@@ -74,40 +76,28 @@ class OS_ELM(object):
         I = np.eye(len(x))    # I.shape = (N, N) N:length of inputa data
 
         # update P
-        temp = np.linalg.pinv(I + H.dot(self.P).dot(HT))    # temp.shape = (N, N)
-        self.P = self.P - (self.P.dot(HT).dot(temp).dot(H).dot(self.P))
+        temp = np.linalg.pinv(I + H.dot(self.p).dot(HT))    # temp.shape = (N, N)
+        self.p = self.p - (self.p.dot(HT).dot(temp).dot(H).dot(self.p))
 
         # update beta
-        self.beta = self.beta + (self.P.dot(HT).dot(y - H.dot(self.beta)))
+        self.beta = self.beta + (self.p.dot(HT).dot(y - H.dot(self.beta)))
 
-    def dump_beta(self, path):
+    def save_weight(self, which, path):
+        if which == 'beta':
+            weight = self.beta
+        elif which == 'beta_init':
+            weight = self.beta_init
+        elif which == 'p':
+            weight = self.p
+        elif which == 'p_init':
+            weight = self.p_init
+        elif which == 'alpha':
+            weight = self.alpha
+        else:
+            raise Exception('no such weight')
         with open(path, 'w') as f:
-            row, col = self.beta.shape
+            row, col = weight.shape
             for i in range(row):
                 for j in range(col):
-                    f.write('%f ' % (self.beta[i][j]))
-                f.write('\n')
-
-    def dump_beta_init(self, path):
-        with open(path, 'w') as f:
-            row, col = self.beta_init.shape
-            for i in range(row):
-                for j in range(col):
-                    f.write('%f ' % (self.beta_init[i][j]))
-                f.write('\n')
-
-    def dump_P_init(self, path):
-        with open(path, 'w') as f:
-            row, col = self.P_init.shape
-            for i in range(row):
-                for j in range(col):
-                    f.write('%f ' % (self.P_init[i][j]))
-                f.write('\n')
-
-    def dump_alpha(self, path):
-        with open(path, 'w') as f:
-            row, col = self.alpha.shape
-            for i in range(row):
-                for j in range(col):
-                    f.write('%f ' % (self.alpha[i][j]))
+                    f.write('%f ' % (weight[i][j]))
                 f.write('\n')
