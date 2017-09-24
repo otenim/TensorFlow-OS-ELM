@@ -24,7 +24,7 @@ class OS_ELM(object):
         lower = np.sum(upper, axis=1).reshape(-1, 1)
         return upper / lower
 
-    def __init__(self, inputs, units, outputs):
+    def __init__(self, inputs, units, outputs, activation='sigmoid'):
         self.inputs = inputs
         self.units = units
         self.outputs = outputs
@@ -38,10 +38,16 @@ class OS_ELM(object):
         self.p_init = None
         self.is_init_phase = True
         self.is_seq_phase = False
+        if activation == 'sigmoid':
+            self.actfun = self._sigmoid
+        elif activation == 'relu':
+            self.actfun = self._relu
+        else:
+            raise Exception('Unknown activation function was specified')
 
     def __call__(self, x):
         h1 = x.dot(self.alpha) + self.bias
-        a1 = self._sigmoid(h1)
+        a1 = self.actfun(h1)
         h2 = a1.dot(self.beta)
         return h2
 
@@ -60,7 +66,7 @@ class OS_ELM(object):
     def init_train(self, x0, y0):
         assert self.is_init_phase, 'initial training phase was over. use [seq_train] instead of [init_train]'
         assert len(x0) >= self.units, 'initial dataset length must be >= %d' % (self.units)
-        H0 = self._sigmoid(x0.dot(self.alpha) + self.bias)
+        H0 = self.actfun(x0.dot(self.alpha) + self.bias)
         H0T = H0.T
         self.p = np.linalg.pinv(H0T.dot(H0))
         self.p_init = np.copy(self.p)
@@ -71,7 +77,7 @@ class OS_ELM(object):
 
     def seq_train(self, x, y):
         assert self.is_seq_phase, 'you have not finished the initial training phase yet'
-        H = self._sigmoid(x.dot(self.alpha))
+        H = self.actfun(x.dot(self.alpha))
         HT = H.T
         I = np.eye(len(x))    # I.shape = (N, N) N:length of inputa data
 
