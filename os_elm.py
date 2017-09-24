@@ -32,7 +32,7 @@ class OS_ELM(object):
         self.alpha_rand = np.copy(self.alpha)
         self.beta = np.random.rand(units, outputs) * 2.0 - 1.0 # [-1.0, 1.0]
         self.beta_rand = np.copy(self.beta)
-        self.beta_init = np.random.rand(units, outputs) * 2.0 - 1.0
+        self.beta_init = None
         self.bias = np.zeros((1, units))
         self.p = None
         self.p_init = None
@@ -60,7 +60,7 @@ class OS_ELM(object):
         elif mode == 'regress':
             return loss
         else:
-            raise Exception('unnexpected mode [%s] was entered.' % mode)
+            raise Exception('unnexpected mode [%s]' % mode)
 
 
     def init_train(self, x0, y0):

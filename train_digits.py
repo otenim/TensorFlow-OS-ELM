@@ -91,6 +91,8 @@ def main(args):
     # dump dataset
     if args.dump_dataset:
         root = os.path.abspath(args.dataset_root)
+        if os.path.exists(root) == False:
+            os.makedirs(root)
         dump_matrix(os.path.join(root, 'x_train_digits.dat'), x_train)
         dump_matrix(os.path.join(root, 'x_test_digits.dat'), x_test)
         dump_matrix(os.path.join(root, 'y_train_digits.dat'), y_train)
