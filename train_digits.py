@@ -25,6 +25,11 @@ parser.add_argument(
     default=128,
 )
 parser.add_argument(
+    '--actfun',
+    choices=['sigmoid', 'relu'],
+    default='sigmoid',
+)
+parser.add_argument(
     '--result_root',
     default=os.path.join(current_directory, 'result', 'digits'),
 )
@@ -56,6 +61,7 @@ def main(args):
     epochs = args.epochs
     result_root = os.path.abspath(args.result_root)
     weights_root = os.path.abspath(args.weights_root)
+    actfun = args.actfun
     inputs = 64
     outputs = 10
     print("/*========== Info ==========*/")
@@ -90,8 +96,6 @@ def main(args):
         dump_matrix(os.path.join(root, 'y_train_digits.dat'), y_train)
         dump_matrix(os.path.join(root, 'y_test_digits.dat'), y_test)
 
-
-
     # separate training data into two groups
     # (for initial training and for sequential training)
     x_train_init = x_train[:init_batch_size]
@@ -108,7 +112,7 @@ def main(args):
         print("/*========== TRAINING EPOCH %d ==========*/" % (epoch + 1))
         # instantiate model
         print("creating model...")
-        model = OS_ELM(inputs=inputs, units=units, outputs=outputs)
+        model = OS_ELM(inputs=inputs, units=units, outputs=outputs, activation=actfun)
 
         # ===================================
         # initial training phase
