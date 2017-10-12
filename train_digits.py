@@ -88,22 +88,24 @@ def main(args):
     y_test = np.eye(outputs)[y_test]
     y_train = np.eye(outputs)[y_train]
 
-    # dump dataset
-    if args.dump_dataset:
-        root = os.path.abspath(args.dataset_root)
-        if os.path.exists(root) == False:
-            os.makedirs(root)
-        dump_matrix(os.path.join(root, 'x_train_digits.dat'), x_train)
-        dump_matrix(os.path.join(root, 'x_test_digits.dat'), x_test)
-        dump_matrix(os.path.join(root, 'y_train_digits.dat'), y_train)
-        dump_matrix(os.path.join(root, 'y_test_digits.dat'), y_test)
-
     # separate training data into two groups
     # (for initial training and for sequential training)
     x_train_init = x_train[:init_batch_size]
     y_train_init = y_train[:init_batch_size]
     x_train_seq = x_train[init_batch_size:]
     y_train_seq = y_train[init_batch_size:]
+
+    # dump dataset
+    if args.dump_dataset:
+        root = os.path.abspath(args.dataset_root)
+        if os.path.exists(root) == False:
+            os.makedirs(root)
+        dump_matrix(os.path.join(root, 'x_train_init.dat'), x_train_init)
+        dump_matrix(os.path.join(root, 'x_train_seq.dat'), x_train_seq)
+        dump_matrix(os.path.join(root, 'x_test.dat'), x_test)
+        dump_matrix(os.path.join(root, 'y_train_init.dat'), y_train_init)
+        dump_matrix(os.path.join(root, 'y_train_seq.dat'), y_train_seq)
+        dump_matrix(os.path.join(root, 'y_test.dat'), y_test)
 
     # Experiment Loop
     sum_loss, sum_acc = 0., 0.
