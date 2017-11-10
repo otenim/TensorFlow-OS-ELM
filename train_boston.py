@@ -3,7 +3,7 @@ from keras.datasets import boston_housing
 import numpy as np
 import os
 import time
-from os_elm import OS_ELM
+from models import OS_ELM
 from utils import normalize_dataset
 
 current_directory = os.path.dirname(os.path.abspath(__file__))

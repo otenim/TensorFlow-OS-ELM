@@ -3,7 +3,7 @@ from sklearn.datasets import load_digits
 import numpy as np
 import os
 import time
-from os_elm import OS_ELM
+from models import OS_ELM
 from utils import normalize_dataset
 from utils import dump_dataset, dump_matrix
 

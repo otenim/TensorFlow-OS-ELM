@@ -3,7 +3,7 @@ import chainer
 import numpy as np
 import os
 import time
-from os_elm import OS_ELM
+from models import OS_ELM
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser()
