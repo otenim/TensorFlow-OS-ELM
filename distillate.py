@@ -18,11 +18,8 @@ parser.add_argument('--units', type=int, default=1024)
 
 def main(args):
 
-    base_model = models.create_mnist_model()
-    base_model.load_weights(args.weight)
-    x = base_model.get_layer(name='before_softmax').output
-    deep_model = Model(base_model.inputs, x)
-    deep_model.summary()
+    deep_model = models.create_mnist_model()
+    deep_model.load_weights(args.weight)
     
     os_elm = models.OS_ELM(
         inputs=28**2,
@@ -45,6 +42,10 @@ def main(args):
     print('Initial training on %d images' % len(x_train_init))
     y_train_init = deep_model.predict(x_train_init)
     os_elm.init_train(x_train_init, y_train_init)
+    loss, acc = os_elm.eval(x_test, y_test)
+    print(loss)
+    print(acc)
+
 
     # Sequential training
     print('Sequential training on %d images' % len(x_train_seq))
