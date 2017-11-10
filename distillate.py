@@ -12,7 +12,6 @@ from tqdm import tqdm
 curdir = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser()
 parser.add_argument('weight')
-parser.add_argument('--epochs', type=int, default=20)
 parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--units', type=int, default=1024)
 
@@ -42,9 +41,6 @@ def main(args):
     print('Initial training on %d images' % len(x_train_init))
     y_train_init = deep_model.predict(x_train_init)
     os_elm.init_train(x_train_init, y_train_init)
-    loss, acc = os_elm.eval(x_test, y_test)
-    print(loss)
-    print(acc)
 
 
     # Sequential training
@@ -52,7 +48,7 @@ def main(args):
     pbar = tqdm(total=len(x_train_seq))
     for i in range(0, len(x_train_seq), args.batch_size):
         x = x_train_seq[i:i+args.batch_size]
-        y = deep_model.predict(x)
+        y = deep_model.predict_on_batch(x)
         os_elm.seq_train(x, y)
         pbar.update(len(x))
     pbar.close()
