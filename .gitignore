@@ -3,6 +3,6 @@
 *.png
 *.out
 __pycache__
-result/
+results/
 weights/
 datasets/
