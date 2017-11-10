@@ -1,7 +1,7 @@
 import keras
 import numpy as np
 from keras.models import Model
-from keras.layers import Input
+from keras.layers import Input, Activation
 from keras.layers import Dense, Dropout
 
 def create_mnist_model():
@@ -10,7 +10,8 @@ def create_mnist_model():
     x = Dropout(0.2)(x)
     x = Dense(512, activation='relu')(x)
     x = Dropout(0.2)(x)
-    x = Dense(10, activation='softmax')(x)
+    x = Dense(10, name='before_softmax')(x)
+    x = Activation(activation='softmax')(x)
     model = Model(input, x)
     return model
 
