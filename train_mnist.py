@@ -20,7 +20,7 @@ parser.add_argument(
 parser.add_argument(
     '--units',
     type=int,
-    default=128,
+    default=1024,
 )
 parser.add_argument(
     '--result_root',

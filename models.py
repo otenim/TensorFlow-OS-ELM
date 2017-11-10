@@ -1,4 +1,19 @@
+import keras
 import numpy as np
+from keras.models import Model
+from keras.layers import Input
+from keras.layers import Dense, Dropout
+
+def create_mnist_model():
+    input = Input(shape=(28*28,))
+    x = Dense(512, activation='relu')(input)
+    x = Dropout(0.2)(x)
+    x = Dense(512, activation='relu')(x)
+    x = Dropout(0.2)(x)
+    x = Dense(10, activation='softmax')(x)
+    model = Model(input, x)
+    return model
+
 
 # Network definition
 class OS_ELM(object):
