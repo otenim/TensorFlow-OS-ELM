@@ -67,10 +67,10 @@ class Boston(object):
 
     def load_data(self):
         (x_train, y_train), (x_test, y_test) = boston_housing.load_data()
-        x_train = z_normalize(x_train.astype(np.float32), axis=0)
-        x_test = z_normalize(x_test.astype(np.float32), axis=0)
-        y_train = y_train.astype(np.float32)
-        y_test = y_test.astype(np.float32)
+        x_train = min_max_normalize(x_train.astype(np.float32), axis=0)
+        x_test = min_max_normalize(x_test.astype(np.float32), axis=0)
+        y_train = min_max_normalize(y_train.astype(np.float32))
+        y_test = min_max_normalize(y_test.astype(np.float32))
         return (x_train,y_train), (x_test, y_test)
 
 def get_dataset(dataset_name):
