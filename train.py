@@ -17,7 +17,7 @@ parser.add_argument('--loss', choices=['mean_squared_error'], default='mean_squa
 def main(args):
 
     if args.dataset == 'mnist':
-        dataset = datasets.mnist()
+        dataset = datasets.Mnist()
     else:
         raise Exception('unknown dataset was specified.')
     (x_train, y_train), (x_test, y_test) = dataset.load_data()
