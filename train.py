@@ -9,25 +9,28 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser()
 parser.add_argument('--result', default=curdir)
 parser.add_argument('--dataset', choices=['mnist'], default='mnist')
-parser.add_argument('--inputs', type=int, default=784)
 parser.add_argument('--units', type=int, default=1024)
-parser.add_argument('--outputs', type=int, default=10)
 parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--activation', choices=['sigmoid'], default='sigmoid')
 parser.add_argument('--loss', choices=['mean_squared_error'], default='mean_squared_error')
 
 def main(args):
 
-    os_elm = models.OS_ELM(args.inputs, args.units, args.outputs, args.activation, args.loss)
-
     if args.dataset == 'mnist':
-        loadfun = datasets.load_mnist
+        dataset = datasets.mnist()
     else:
         raise Exception('unknown dataset was specified.')
-    (x_train, y_train), (x_test, y_test) = loadfun()
+    (x_train, y_train), (x_test, y_test) = dataset.load_data()
     border = int(args.units * 1.1)
     x_train_init, x_train_seq = x_train[:border], x_train[border:]
     y_train_init, y_train_seq = y_train[:border], y_train[border:]
+
+    os_elm = models.OS_ELM(
+        inputs=dataset.inputs,
+        units=args.units,
+        outputs=dataset.outputs,
+        activation=args.activation,
+        loss=args.loss)
 
     print('=====> initial training phase')
     os_elm.init_train(x_train_init, y_train_init)
