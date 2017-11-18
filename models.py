@@ -1,64 +1,48 @@
-import keras
 import numpy as np
-from keras.models import Model
-from keras.layers import Input, Activation
-from keras.layers import Dense, Dropout
-
-def create_mnist_model():
-    input = Input(shape=(28*28,))
-    x = Dense(1024, activation='relu')(input)
-    x = Dropout(0.2)(x)
-    x = Dense(1024, activation='relu')(x)
-    x = Dropout(0.2)(x)
-    x = Dense(10, activation='softmax')(x)
-    model = Model(input, x)
-    return model
-
 
 # Network definition
 class OS_ELM(object):
 
-    def _mean_squared_error(self, out, y):
-        batch_size = len(out)
-        return 0.5 * np.sum((out - y)**2) / batch_size
+    def __mean_squared_error(self, out, y):
+        return 0.5 * np.mean((out - y)**2)
 
-    def _accuracy(self, out, y):
+    def __accuracy(self, out, y):
         batch_size = len(out)
         accuracy = np.sum((np.argmax(out, axis=1) == np.argmax(y, axis=1)))
-        return 100.0 * accuracy / batch_size
+        return accuracy / batch_size
 
-    def _sigmoid(self, x):
+    def __sigmoid(self, x):
         return 1.0 / (1.0 + np.exp(-1.0 * x))
 
-    def _relu(self, x):
+    def __relu(self, x):
         return np.maximum(0, x)
 
-    def _softmax(self, x):
+    def __softmax(self, x):
         c = np.max(x, axis=1).reshape(-1, 1)
         upper = np.exp(x - c)
         lower = np.sum(upper, axis=1).reshape(-1, 1)
         return upper / lower
 
-    def __init__(self, inputs, units, outputs, activation='sigmoid'):
+    def __init__(self, inputs, units, outputs, activation='sigmoid', loss='mean_squared_error'):
         self.inputs = inputs
         self.units = units
         self.outputs = outputs
         self.alpha = np.random.rand(inputs, units) * 2.0 - 1.0 # [-1.0, 1.0]
-        self.alpha_rand = np.copy(self.alpha)
         self.beta = np.random.rand(units, outputs) * 2.0 - 1.0 # [-1.0, 1.0]
-        self.beta_rand = np.copy(self.beta)
-        self.beta_init = None
-        self.bias = np.zeros((1, units))
+        self.bias = np.zeros(shape=(1,self.units))
         self.p = None
-        self.p_init = None
         self.is_init_phase = True
         self.is_seq_phase = False
-        if activation == 'sigmoid':
-            self.actfun = self._sigmoid
-        elif activation == 'relu':
-            self.actfun = self._relu
+        if loss == 'mean_squared_error':
+            self.lossfun = self.__mean_squared_error
         else:
-            raise Exception('Unknown activation function was specified')
+            raise Exception('unknown loss function was specified.')
+        if activation == 'sigmoid':
+            self.actfun = self.__sigmoid
+        elif activation == 'relu':
+            self.actfun = self.__relu
+        else:
+            raise Exception('unknown activation function was specified.')
 
     def __call__(self, x):
         h1 = x.dot(self.alpha) + self.bias
@@ -66,27 +50,21 @@ class OS_ELM(object):
         h2 = a1.dot(self.beta)
         return h2
 
-    def eval(self, x, y, mode='classify'):
+    def compute_accuracy(x, y):
+        out = self.__softmax(self(x))
+        return self.__accuracy(out, y)
+
+    def compute_loss(x, y):
         out = self(x)
-        loss = self._mean_squared_error(out, y)
-        if mode == 'classify':
-            accuracy = self._accuracy(out, y)
-            return loss, accuracy
-        elif mode == 'regress':
-            return loss
-        else:
-            raise Exception('unnexpected mode [%s]' % mode)
+        return self.lossfun(out, y)
 
-
-    def init_train(self, x0, y0):
-        assert self.is_init_phase, 'initial training phase was over. use [seq_train] instead of [init_train]'
-        assert len(x0) >= self.units, 'initial dataset length must be >= %d' % (self.units)
-        H0 = self.actfun(x0.dot(self.alpha) + self.bias)
-        H0T = H0.T
-        self.p = np.linalg.pinv(H0T.dot(H0))
-        self.p_init = np.copy(self.p)
-        self.beta = self.p.dot(H0T).dot(y0)
-        self.beta_init = np.copy(self.beta)
+    def init_train(self, x, y):
+        assert self.is_init_phase, 'initial training phase was over. use \'seq_train\' instead of \'init_train\''
+        assert len(x) >= self.units, 'initial dataset size must be >= %d' % (self.units)
+        H = self.actfun(x.dot(self.alpha) + self.bias)
+        HT = H.T
+        self.p = np.linalg.pinv(HT.dot(H))
+        self.beta = self.p.dot(HT).dot(y)
         self.is_init_phase = False
         self.is_seq_phase = True
 
@@ -94,7 +72,7 @@ class OS_ELM(object):
         assert self.is_seq_phase, 'you have not finished the initial training phase yet'
         H = self.actfun(x.dot(self.alpha))
         HT = H.T
-        I = np.eye(len(x))    # I.shape = (N, N) N:length of inputa data
+        I = np.eye(len(x))# I.shape = (N, N) N:length of inputa data
 
         # update P
         temp = np.linalg.pinv(I + H.dot(self.p).dot(HT))    # temp.shape = (N, N)
@@ -102,23 +80,3 @@ class OS_ELM(object):
 
         # update beta
         self.beta = self.beta + (self.p.dot(HT).dot(y - H.dot(self.beta)))
-
-    def save_weight(self, which, path):
-        if which == 'beta':
-            weight = self.beta
-        elif which == 'beta_init':
-            weight = self.beta_init
-        elif which == 'p':
-            weight = self.p
-        elif which == 'p_init':
-            weight = self.p_init
-        elif which == 'alpha':
-            weight = self.alpha
-        else:
-            raise Exception('no such weight')
-        with open(path, 'w') as f:
-            row, col = weight.shape
-            for i in range(row):
-                for j in range(col):
-                    f.write('%f ' % (weight[i][j]))
-                f.write('\n')
