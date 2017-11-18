@@ -8,7 +8,11 @@ from tqdm import tqdm
 curdir = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser()
 parser.add_argument('--result', default=curdir)
-parser.add_argument('--dataset', choices=['mnist'], default='mnist')
+parser.add_argument(
+    '--dataset',
+    choices=['mnist', 'fashion', 'digits', 'boston'],
+    default='mnist'
+)
 parser.add_argument('--units', type=int, default=1024)
 parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--activation', choices=['sigmoid'], default='sigmoid')
@@ -16,10 +20,7 @@ parser.add_argument('--loss', choices=['mean_squared_error'], default='mean_squa
 
 def main(args):
 
-    if args.dataset == 'mnist':
-        dataset = datasets.Mnist()
-    else:
-        raise Exception('unknown dataset was specified.')
+    dataset = datasets.get_dataset(args.dataset)
     (x_train, y_train), (x_test, y_test) = dataset.load_data()
     border = int(args.units * 1.1)
     x_train_init, x_train_seq = x_train[:border], x_train[border:]
@@ -45,10 +46,12 @@ def main(args):
     pbar.close()
 
     print('=====> evaluation phase')
-    test_acc = os_elm.compute_accuracy(x_test,y_test)
     test_loss = os_elm.compute_loss(x_test,y_test)
-    print('test accuracy: %f' % test_acc)
     print('test loss: %f' % test_loss)
+    if dataset.type == 'classification':
+        test_acc = os_elm.compute_accuracy(x_test,y_test)
+        print('test accuracy: %f' % test_acc)
+
 
 if __name__ == '__main__':
     args = parser.parse_args()
