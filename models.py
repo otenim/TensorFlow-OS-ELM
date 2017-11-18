@@ -50,11 +50,11 @@ class OS_ELM(object):
         h2 = a1.dot(self.beta)
         return h2
 
-    def compute_accuracy(x, y):
+    def compute_accuracy(self, x, y):
         out = self.__softmax(self(x))
         return self.__accuracy(out, y)
 
-    def compute_loss(x, y):
+    def compute_loss(self, x, y):
         out = self(x)
         return self.lossfun(out, y)
 
