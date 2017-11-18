@@ -6,12 +6,11 @@ from keras.layers import Dense, Dropout
 
 def create_mnist_model():
     input = Input(shape=(28*28,))
-    x = Dense(512, activation='relu')(input)
+    x = Dense(1024, activation='relu')(input)
     x = Dropout(0.2)(x)
-    x = Dense(512, activation='relu')(x)
+    x = Dense(1024, activation='relu')(x)
     x = Dropout(0.2)(x)
-    x = Dense(10, name='before_softmax')(x)
-    x = Activation(activation='softmax')(x)
+    x = Dense(10, activation='softmax')(x)
     model = Model(input, x)
     return model
 
