@@ -2,7 +2,7 @@
 *.jpg
 *.png
 *.out
-__pycache__
+__pycache__/
 results/
 weights/
 datasets/
