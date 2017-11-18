@@ -19,7 +19,7 @@ parser.add_argument('--activation', choices=['sigmoid'], default='sigmoid')
 parser.add_argument('--loss', choices=['mean_squared_error'], default='mean_squared_error')
 
 def main(args):
-
+    
     dataset = datasets.get_dataset(args.dataset)
     (x_train, y_train), (x_test, y_test) = dataset.load_data()
     border = int(args.units * 1.1)

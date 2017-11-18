@@ -1,21 +1,10 @@
 from keras.datasets import mnist, fashion_mnist, boston_housing
 from keras.utils import to_categorical
 from sklearn.datasets import load_digits
-from utils import min_max_normalize
+from utils import min_max_normalize, z_normalize
 import numpy as np
 
-def get_dataset(dataset_name):
-    if dataset_name == 'mnist':
-        dataset = datasets.Mnist()
-    elif dataset_name == 'fashion':
-        dataset = datasets.Fashion()
-    elif dataset_name == 'digits':
-        dataset = datasets.Digits()
-    elif dataset_name == 'boston':
-        dataset = datasets.Boston()
-    else:
-        raise Exception('unknown dataset was specified.')
-    return dataset
+
 
 class Mnist(object):
     def __init__(self):
@@ -55,7 +44,7 @@ class Digits(object):
     def __init__(self):
         self.type = 'classification'
         self.num_classes = 10
-        self.inputs = 784
+        self.inputs = 64
         self.outputs= 10
         self.split = 0.8
 
@@ -68,7 +57,7 @@ class Digits(object):
         border = int(len(x) * self.split)
         x_train, x_test = x[:border], x[border:]
         y_train, y_test = y[:border], y[border:]
-        return (x_train, x_test), (y_train, y_test)
+        return (x_train, y_train), (x_test, y_test)
 
 class Boston(object):
     def __init__(self):
@@ -78,8 +67,21 @@ class Boston(object):
 
     def load_data(self):
         (x_train, y_train), (x_test, y_test) = boston_housing.load_data()
-        x_train = min_max_normalize(x_train.astype(np.float32), axis=0)
-        x_test = min_max_normalize(x_test.astype(np.float32), axis=0)
+        x_train = z_normalize(x_train.astype(np.float32), axis=0)
+        x_test = z_normalize(x_test.astype(np.float32), axis=0)
         y_train = y_train.astype(np.float32)
         y_test = y_test.astype(np.float32)
-        return (x_train,x_test), (y_train, y_test)
+        return (x_train,y_train), (x_test, y_test)
+
+def get_dataset(dataset_name):
+    if dataset_name == 'mnist':
+        dataset = Mnist()
+    elif dataset_name == 'fashion':
+        dataset = Fashion()
+    elif dataset_name == 'digits':
+        dataset = Digits()
+    elif dataset_name == 'boston':
+        dataset = Boston()
+    else:
+        raise Exception('unknown dataset was specified.')
+    return dataset
