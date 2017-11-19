@@ -15,7 +15,7 @@ parser.add_argument(
     choices=['mnist', 'fashion', 'digits', 'boston'],
     default='mnist'
 )
-parser.add_argument('--epochs', type=int, default=50)
+parser.add_argument('--epochs', type=int, default=10)
 parser.add_argument('--units', type=int, default=1024)
 parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--activation', choices=['sigmoid'], default='sigmoid')
