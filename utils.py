@@ -24,8 +24,9 @@ def save_data(data, result_dir):
         f.write('batch_size: %d\n' % (data['batch_size']))
         f.write('units: %d\n' % (data['units']))
         f.write('activation: %s\n' % (data['activation']))
-        f.write('loss: %.5f\n' % (data['loss']))
         f.write('mean_init_train_time: %.5f[sec]\n' % (data['mean_init_train_time']))
         f.write('mean_seq_train_time: %.5f[sec/batch]\n' % (data['mean_seq_train_time']))
         f.write('mean_pred_time: %.5f[sec/batch]\n' % (data['mean_pred_time']))
         f.write('mean_test_loss: %.5f\n' % (data['mean_test_loss']))
+        if data.get('mean_test_acc'):
+            f.write('mean_test_acc: %.5f\n' % (data['mean_test_acc']))
