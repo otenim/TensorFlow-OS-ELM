@@ -1,4 +1,5 @@
 import numpy as np
+import pickle
 
 # Network definition
 class OS_ELM(object):
@@ -80,3 +81,11 @@ class OS_ELM(object):
 
         # update beta
         self.beta = self.beta + (self.p.dot(HT).dot(y - H.dot(self.beta)))
+
+    def save_weights(self, path):
+        weights = {
+            'alpha': self.alpha,
+            'beta': self.beta,
+            'p': self.p}
+        with open(path, 'wb') as f:
+            pickle.dump(weights, f)
