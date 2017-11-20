@@ -13,9 +13,19 @@ def z_normalize(x, axis=None):
     return (x - mean)/std
 
 def save_data(data, result_dir):
-    dataset = data['dataset']
-    units = data['units']
-    batch_size = data['batch_size']
-    fname = '%s_units%d_bsize%d.pkl' % (dataset, units, batch_size)
-    with open(os.path.join(result_dir, fname), 'wb') as f:
-        pkl.dump(data, f)
+    fname = '%s_units%d_bsize%d.txt' % (
+        data['dataset'],
+        data['units'],
+        data['batch_size'])
+    with open(os.path.join(result_dir, fname), 'w') as f:
+        f.write('********** Results **********\n')
+        f.write('dataset: %s\n' % data['dataset'])
+        f.write('epochs: %d\n' % (data['epochs']))
+        f.write('batch_size: %d\n' % (data['batch_size']))
+        f.write('units: %d\n' % (data['units']))
+        f.write('activation: %s\n' % (data['activation']))
+        f.write('loss: %.5f\n' % (data['loss']))
+        f.write('mean_init_train_time: %.5f[sec]\n' % (data['mean_init_train_time']))
+        f.write('mean_seq_train_time: %.5f[sec/batch]\n' % (data['mean_seq_train_time']))
+        f.write('mean_pred_time: %.5f[sec/batch]\n' % (data['mean_pred_time']))
+        f.write('mean_test_loss: %.5f\n' % (data['mean_test_loss']))
