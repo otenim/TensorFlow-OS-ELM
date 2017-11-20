@@ -30,3 +30,13 @@ def save_data(data, result_dir):
         f.write('mean_test_loss: %.5f\n' % (data['mean_test_loss']))
         if data.get('mean_test_acc'):
             f.write('mean_test_acc: %.5f\n' % (data['mean_test_acc']))
+        f.write('********** Record **********\n')
+        f.write('|init [sec]|seq [sec/batch]|pred [sec/batch]|loss|*acc|\n')
+        f.write('<tr>\n')
+        f.write('\t<td>%.5f</td>\n' % (data['mean_init_train_time']))
+        f.write('\t<td>%.5f</td>\n' % (data['mean_seq_train_time']))
+        f.write('\t<td>%.5f</td>\n' % (data['mean_pred_time']))
+        f.write('\t<td>%.5f</td>\n' % (data['mean_test_loss']))
+        if data.get('mean_test_acc'):
+            f.write('\t<td>%.5f</td>\n' % (data['mean_test_acc']))
+        f.write('</tr>\n')
