@@ -53,15 +53,14 @@ class OS_ELM(object):
         h1 = x.dot(self.alpha) + self.bias
         a1 = self.actfun(h1)
         h2 = a1.dot(self.beta)
-        return h2
+        out = self.__softmax(h2)
+        return out
 
     def compute_accuracy(self, x, y):
-        out = self.__softmax(self(x))
-        return self.__accuracy(out, y)
+        return self.__accuracy(self(x), y)
 
     def compute_loss(self, x, y):
-        out = self(x)
-        return self.lossfun(out, y)
+        return self.lossfun(self(x), y)
 
     def init_train(self, x, y):
         assert len(x) >= self.units, 'initial dataset size must be >= %d' % (self.units)
