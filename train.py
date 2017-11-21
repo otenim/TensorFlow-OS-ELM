@@ -5,18 +5,18 @@ import models
 import datasets
 import time
 from tqdm import tqdm
-from utils import save_data
+from utils import save_result
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser()
-parser.add_argument('--result', default=None)
-parser.add_argument('--weights', default=None)
+parser.add_argument('--save_result', default=None)
+parser.add_argument('--save_model', default=None)
 parser.add_argument(
     '--dataset',
     choices=['mnist', 'fashion', 'digits', 'boston'],
     default='mnist'
 )
-parser.add_argument('--epochs', type=int, default=10)
+parser.add_argument('--epochs', type=int, default=20)
 parser.add_argument('--units', type=int, default=1024)
 parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--activation', choices=['sigmoid'], default='sigmoid')
@@ -78,8 +78,8 @@ def main(args):
             print('test acc: %f' % test_acc)
 
     # save results
-    if args.result:
-        data = {
+    if args.save_result:
+        result = {
             'dataset': args.dataset,
             'epochs': args.epochs,
             'batch_size': args.batch_size,
@@ -91,17 +91,17 @@ def main(args):
             'mean_test_loss': np.mean(test_loss_data),
             'mean_pred_time': np.mean(pred_time_data)}
         if dataset.type == 'classification':
-            data['mean_test_acc'] = np.mean(test_acc_data)
-        if os.path.exists(args.result) == False:
-            os.makedirs(args.result)
-        save_data(data, args.result)
+            result['mean_test_acc'] = np.mean(test_acc_data)
+        if os.path.exists(args.save_result) == False:
+            os.makedirs(args.save_result)
+        save_result(result, args.save_result)
 
     # save weights
-    if args.weights:
-        if os.path.exists(args.weights) == False:
-            os.makedirs(args.weights)
-        fname = 'w_%s_units%d_bsize%d.pkl' % (args.dataset, args.units, args.batch_size)
-        os_elm.save_weights(os.path.join(args.weights, fname))
+    if args.save_model:
+        if os.path.exists(args.save_model) == False:
+            os.makedirs(args.save_model)
+        fname = '%s_u%d_b%d.pkl' % (args.dataset, args.units, args.batch_size)
+        os_elm.save(os.path.join(args.save_model, fname))
 
 
 if __name__ == '__main__':

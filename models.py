@@ -97,6 +97,10 @@ class OS_ELM(object):
             self.beta = weights['beta']
             self.p = weights['p']
 
+    def save(self, path):
+        with open(path, 'wb') as f:
+            pickle.dump(self,f)
+
 def create_mnist_mlp():
     input_shape = (28**2,)
     num_classes = 10
