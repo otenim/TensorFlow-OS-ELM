@@ -1,3 +1,9 @@
+import keras
+from keras.models import Model
+from keras.layers import Input
+from keras.layers.core import Dense, Dropout, Flatten
+from keras.layers.convolutional import Conv2D, MaxPooling2D
+from keras.optimizers import Adam
 import numpy as np
 import pickle
 
@@ -32,8 +38,6 @@ class OS_ELM(object):
         self.beta = np.random.rand(units, outputs) * 2.0 - 1.0 # [-1.0, 1.0]
         self.bias = np.zeros(shape=(1,self.units))
         self.p = None
-        self.is_init_phase = True
-        self.is_seq_phase = False
         if loss == 'mean_squared_error':
             self.lossfun = self.__mean_squared_error
         else:
@@ -60,17 +64,13 @@ class OS_ELM(object):
         return self.lossfun(out, y)
 
     def init_train(self, x, y):
-        assert self.is_init_phase, 'initial training phase was over. use \'seq_train\' instead of \'init_train\''
         assert len(x) >= self.units, 'initial dataset size must be >= %d' % (self.units)
         H = self.actfun(x.dot(self.alpha) + self.bias)
         HT = H.T
         self.p = np.linalg.pinv(HT.dot(H))
         self.beta = self.p.dot(HT).dot(y)
-        self.is_init_phase = False
-        self.is_seq_phase = True
 
     def seq_train(self, x, y):
-        assert self.is_seq_phase, 'you have not finished the initial training phase yet'
         H = self.actfun(x.dot(self.alpha))
         HT = H.T
         I = np.eye(len(x))# I.shape = (N, N) N:length of inputa data
@@ -89,3 +89,37 @@ class OS_ELM(object):
             'p': self.p}
         with open(path, 'wb') as f:
             pickle.dump(weights, f)
+
+    def load_weights(self, path):
+        with open(path, 'rb') as f:
+            weights = pickle.load(f)
+            self.alpha = weights['alpha']
+            self.beta = weights['beta']
+            self.p = weights['p']
+
+def create_mnist_mlp():
+    input_shape = (28**28,)
+    num_classes = 10
+    input = Input(shape=input_shape)
+    x = Dense(512, activation='relu')(input)
+    x = Dropout(0.2)(x)
+    x = Dense(512, activation='relu')(x)
+    x = Dropout(0.2)(x)
+    x = Dense(num_classes, activation='softmax')(x)
+    model = Model(input, x)
+    return model
+
+def create_mnist_cnn():
+    input_shape = (28,28,1)
+    num_classes = 10
+    input = Input(shape=input_shape)
+    x = Conv2D(32, (3,3), activation='relu')(input)
+    x = Conv2D(64, (3,3), activation='relu')(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+    x = Dropout(0.25)(x)
+    x = Flatten()(x)
+    x = Dense(128, activation='relu')(x)
+    x = Dropout(0.5)(x)
+    x = Dense(num_classes, activation='softmax')(x)
+    model = Model(input,x)
+    return model
