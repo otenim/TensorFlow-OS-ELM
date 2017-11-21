@@ -5,12 +5,12 @@ import models
 import datasets
 import time
 from tqdm import tqdm
-from utils import save_result
+import utils
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser()
-parser.add_argument('--save_result', default=None)
-parser.add_argument('--save_model', default=None)
+parser.add_argument('--result_dir', default=None)
+parser.add_argument('--model_dir', default=None)
 parser.add_argument(
     '--dataset',
     choices=['mnist', 'fashion', 'digits', 'boston'],
@@ -78,7 +78,7 @@ def main(args):
             print('test acc: %f' % test_acc)
 
     # save results
-    if args.save_result:
+    if args.result_dir:
         result = {
             'dataset': args.dataset,
             'epochs': args.epochs,
@@ -92,16 +92,16 @@ def main(args):
             'mean_pred_time': np.mean(pred_time_data)}
         if dataset.type == 'classification':
             result['mean_test_acc'] = np.mean(test_acc_data)
-        if os.path.exists(args.save_result) == False:
-            os.makedirs(args.save_result)
-        save_result(result, args.save_result)
+        if os.path.exists(args.result_dir) == False:
+            os.makedirs(args.result_dir)
+        utils.save_result(result, args.result_dir)
 
     # save weights
-    if args.save_model:
-        if os.path.exists(args.save_model) == False:
-            os.makedirs(args.save_model)
+    if args.model_dir:
+        if os.path.exists(args.model_dir) == False:
+            os.makedirs(args.model_dir)
         fname = '%s_u%d_b%d.pkl' % (args.dataset, args.units, args.batch_size)
-        os_elm.save(os.path.join(args.save_model, fname))
+        os_elm.save(os.path.join(args.model_dir, fname))
 
 
 if __name__ == '__main__':
