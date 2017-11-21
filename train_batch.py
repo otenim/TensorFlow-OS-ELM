@@ -42,7 +42,7 @@ def main(args):
     model.compile(optimizer=Adam(), loss=lossfun, metrics=['accuracy'])
 
     # prepare dataset
-    (x_train, y_train), (x_test, y'mlp'_test) = dataset
+    (x_train, y_train), (x_test, y_test) = dataset
 
     # training
     model.fit(
