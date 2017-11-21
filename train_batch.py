@@ -8,41 +8,27 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser()
 parser.add_argument(
     'model',
-    choices=[
-        'mnist_mlp',
-        'mnist_cnn',
-        'fashion_mlp',
-        'fashion_cnn'
-    ])
-parser.add_argument('--weights', default=None)
-parser.add_argument('--epochs', type=int, default=10)
+    choices=['mnist_mlp','mnist_cnn','fashion_mlp','fashion_cnn'])
+parser.add_argument(
+    'dataset',
+    choices=['mnist','fashion'])
+parser.add_argument('--epochs', type=int, default=20)
 parser.add_argument('--batch_size', type=int, default=32)
+parser.add_argument('--result', default=None)
+
 
 def main(args):
 
     # instantiate model and dataset
-    if args.model == 'mnist_mlp':
-        model = models.create_mnist_mlp()
-        dataset = datasets.get_dataset('mnist').load_data()
-        lossfun = 'categorical_crossentropy'
-    elif args.model == 'mnist_cnn':
-        model = models.create_mnist_cnn()
-        dataset = datasets.get_dataset('mnist').load_data(network='cnn')
-        lossfun = 'categorical_crossentropy'
-    elif args.model == 'fashion_mlp':
-        model = models.create_fashion_mlp()
-        dataset = datasets.get_dataset('mnist').load_data()
-        lossfun = 'categorical_crossentropy'
-    elif args.model == 'fashion_cnn':
-        model = models.create_fashion_cnn()
-        dataset = datasets.get_dataset('mnist').load_data(network='cnn')
-        lossfun = 'categorical_crossentropy'
-    else:
-        raise Exception('unknown model was specified.')
-    model.compile(optimizer=Adam(), loss=lossfun, metrics=['accuracy'])
+    model, opt, lossfunc = models.get_batch_model(args.model)
+    model.compile(optimizer=opt, loss=lossfunc)
 
     # prepare dataset
-    (x_train, y_train), (x_test, y_test) = dataset
+    dataset = datasets.get_dataset(args.dataset)
+    (x_train, y_train), (x_test, y_test) = dataset.load_data()
+    if args.model == 'mnist_cnn' or args.model == 'fashion_cnn':
+        x_train = x_train.reshape(-1,28,28,1)
+        x_test = x_test.reshape(-1,28,28,1)
 
     # training
     model.fit(
@@ -54,12 +40,12 @@ def main(args):
         validation_data=(x_test,y_test),
         shuffle=True)
 
-    # save weights
-    if args.weights:
-        if os.path.exists(args.weights) == False:
-            os.makedirs(args.weights)
-        fname = 'w_epochs%d_bsize%d.h5' % (args.epochs, args.batch_size)
-        model.save_weights(os.path.join(args.weights, fname))
+    # save model
+    if args.result:
+        if os.path.exists(args.result) == False:
+            os.makedirs(args.result)
+        fname = '%s_e%d_b%d.h5' % (args.dataset, args.epochs, args.batch_size)
+        model.save(os.path.join(args.result, fname))
 
 if __name__ == '__main__':
     args = parser.parse_args()

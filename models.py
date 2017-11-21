@@ -4,6 +4,7 @@ from keras.layers import Input
 from keras.layers.core import Dense, Dropout, Flatten
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.optimizers import Adam
+from keras.losses import categorical_crossentropy
 import numpy as np
 import pickle
 
@@ -128,3 +129,24 @@ def create_fashion_mlp():
 
 def create_fashion_cnn():
     return create_mnist_cnn()
+
+def get_batch_model(model_name):
+    if model_name == 'mnist_mlp':
+        model = create_mnist_mlp()
+        opt = Adam()
+        lossfun = categorical_crossentropy
+    elif model_name == 'mnist_cnn':
+        model = create_mnist_cnn()
+        opt = Adam()
+        lossfun = categorical_crossentropy
+    elif model_name == 'fashion_mlp':
+        model = create_fashion_mlp()
+        opt = Adam()
+        lossfun = categorical_crossentropy
+    elif model_name == 'fashion_cnn':
+        model = create_fashion_cnn()
+        opt = Adam()
+        lossfun = categorical_crossentropy
+    else:
+        raise Exception('unknown model was specified.')
+    return (model, opt, lossfun)
