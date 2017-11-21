@@ -1,11 +1,5 @@
-*.dump
-*.jpg
-*.png
 *.out
 __pycache__/
-results/
-weights/
-datasets/
-scripts/
-evaluations/
-communication/
+weights/*
+datasets/*
+results/*
