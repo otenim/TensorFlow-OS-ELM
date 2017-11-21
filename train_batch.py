@@ -58,7 +58,7 @@ def main(args):
     if args.weights:
         if os.path.exists(args.weights) == False:
             os.makedirs(args.weights)
-        fname = 'w_epochs%d_bsize%d' % (args.epochs, args.batch_size)
+        fname = 'w_epochs%d_bsize%d.h5' % (args.epochs, args.batch_size)
         model.save_weights(os.path.join(args.weights, fname))
 
 if __name__ == '__main__':
