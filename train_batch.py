@@ -14,7 +14,7 @@ parser.add_argument(
     choices=['mnist','fashion'])
 parser.add_argument('--epochs', type=int, default=20)
 parser.add_argument('--batch_size', type=int, default=32)
-parser.add_argument('--save_model', default=None)
+parser.add_argument('--model_dir', default=None)
 
 
 def main(args):
@@ -41,11 +41,11 @@ def main(args):
         shuffle=True)
 
     # save model
-    if args.save_model:
-        if os.path.exists(args.save_model) == False:
-            os.makedirs(args.save_model)
-        fname = 'm_%s_e%d_b%d.h5' % (args.dataset, args.epochs, args.batch_size)
-        model.save(os.path.join(args.save_model, fname))
+    if args.model_dir:
+        if os.path.exists(args.model_dir) == False:
+            os.makedirs(args.model_dir)
+        fname = 'm_%s_e%d_b%d.h5' % (args.model, args.epochs, args.batch_size)
+        model.save(os.path.join(args.model_dir, fname))
 
 if __name__ == '__main__':
     args = parser.parse_args()
