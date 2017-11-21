@@ -98,7 +98,7 @@ class OS_ELM(object):
             self.p = weights['p']
 
 def create_mnist_mlp():
-    input_shape = (28**28,)
+    input_shape = (28**2,)
     num_classes = 10
     input = Input(shape=input_shape)
     x = Dense(512, activation='relu')(input)
