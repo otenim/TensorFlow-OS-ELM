@@ -123,3 +123,9 @@ def create_mnist_cnn():
     x = Dense(num_classes, activation='softmax')(x)
     model = Model(input,x)
     return model
+
+def create_fashion_mlp():
+    return create_mnist_mlp()
+
+def create_fashion_cnn():
+    return create_mnist_cnn()

@@ -34,12 +34,16 @@ class Fashion(object):
         self.inputs = 784
         self.outputs = 10
 
-    def load_data(self):
+    def load_data(self, network='mlp'):
         (x_train, y_train), (x_test, y_test) = mnist.load_data()
         x_train = x_train.astype(np.float32) / 255.
         x_test = x_test.astype(np.float32) / 255.
-        x_train = x_train.reshape(-1,self.inputs)
-        x_test = x_test.reshape(-1,self.inputs)
+        if network == 'mlp':
+            x_train = x_train.reshape(-1,self.inputs)
+            x_test = x_test.reshape(-1,self.inputs)
+        elif network == 'cnn':
+            x_train = x_train.reshape(-1, 28, 28, 1)
+            x_test = x_test.reshape(-1, 28, 28, 1)
         y_train = to_categorical(y_train.astype(np.float32), self.num_classes)
         y_test = to_categorical(y_test.astype(np.float32), self.num_classes)
         return (x_train, y_train), (x_test, y_test)

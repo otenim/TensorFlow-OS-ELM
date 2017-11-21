@@ -8,7 +8,12 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser()
 parser.add_argument(
     'model',
-    choices=['mnist_mlp','mnist_cnn'])
+    choices=[
+        'mnist_mlp',
+        'mnist_cnn',
+        'fashion_mlp',
+        'fashion_cnn'
+    ])
 parser.add_argument('--weights', default=None)
 parser.add_argument('--epochs', type=int, default=10)
 parser.add_argument('--batch_size', type=int, default=32)
@@ -24,12 +29,20 @@ def main(args):
         model = models.create_mnist_cnn()
         dataset = datasets.get_dataset('mnist').load_data(network='cnn')
         lossfun = 'categorical_crossentropy'
+    elif args.model == 'fashion_mlp':
+        model = models.create_fashion_mlp()
+        dataset = datasets.get_dataset('mnist').load_data()
+        lossfun = 'categorical_crossentropy'
+    elif args.model == 'fashion_cnn':
+        model = models.create_fashion_cnn()
+        dataset = datasets.get_dataset('mnist').load_data(network='cnn')
+        lossfun = 'categorical_crossentropy'
     else:
         raise Exception('unknown model was specified.')
     model.compile(optimizer=Adam(), loss=lossfun, metrics=['accuracy'])
 
     # prepare dataset
-    (x_train, y_train), (x_test, y_test) = dataset
+    (x_train, y_train), (x_test, y'mlp'_test) = dataset
 
     # training
     model.fit(
