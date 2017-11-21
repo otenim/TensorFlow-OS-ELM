@@ -44,7 +44,7 @@ def main(args):
     if args.save_model:
         if os.path.exists(args.save_model) == False:
             os.makedirs(args.save_model)
-        fname = '%s_e%d_b%d.h5' % (args.dataset, args.epochs, args.batch_size)
+        fname = 'm_%s_e%d_b%d.h5' % (args.dataset, args.epochs, args.batch_size)
         model.save(os.path.join(args.save_model, fname))
 
 if __name__ == '__main__':

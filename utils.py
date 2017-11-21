@@ -13,7 +13,7 @@ def z_normalize(x, axis=None):
     return (x - mean)/std
 
 def save_result(result, result_dir):
-    fname = '%s_units%d_bsize%d.txt' % (
+    fname = 'r_%s_u%d_b%d.txt' % (
         result['dataset'],
         result['units'],
         result['batch_size'])

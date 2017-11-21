@@ -96,11 +96,11 @@ def main(args):
             os.makedirs(args.result_dir)
         utils.save_result(result, args.result_dir)
 
-    # save weights
+    # save model
     if args.model_dir:
         if os.path.exists(args.model_dir) == False:
             os.makedirs(args.model_dir)
-        fname = '%s_u%d_b%d.pkl' % (args.dataset, args.units, args.batch_size)
+        fname = 'm_%s_u%d_b%d.pkl' % (args.dataset, args.units, args.batch_size)
         os_elm.save(os.path.join(args.model_dir, fname))
 
 
