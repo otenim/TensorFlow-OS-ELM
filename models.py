@@ -1,10 +1,3 @@
-import keras
-from keras.models import Model
-from keras.layers import Input
-from keras.layers.core import Dense, Dropout, Flatten
-from keras.layers.convolutional import Conv2D, MaxPooling2D
-from keras.optimizers import Adam
-from keras.losses import categorical_crossentropy
 import numpy as np
 import pickle
 
@@ -103,57 +96,3 @@ class OS_ELM(object):
     def save(self, path):
         with open(path, 'wb') as f:
             pickle.dump(self,f)
-
-def create_mnist_mlp():
-    input_shape = (28**2,)
-    num_classes = 10
-    input = Input(shape=input_shape)
-    x = Dense(512, activation='relu')(input)
-    x = Dropout(0.2)(x)
-    x = Dense(512, activation='relu')(x)
-    x = Dropout(0.2)(x)
-    x = Dense(num_classes, activation='softmax')(x)
-    model = Model(input, x)
-    return model
-
-def create_mnist_cnn():
-    input_shape = (28,28,1)
-    num_classes = 10
-    input = Input(shape=input_shape)
-    x = Conv2D(32, (3,3), activation='relu')(input)
-    x = Conv2D(64, (3,3), activation='relu')(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-    x = Dropout(0.25)(x)
-    x = Flatten()(x)
-    x = Dense(128, activation='relu')(x)
-    x = Dropout(0.5)(x)
-    x = Dense(num_classes, activation='softmax')(x)
-    model = Model(input,x)
-    return model
-
-def create_fashion_mlp():
-    return create_mnist_mlp()
-
-def create_fashion_cnn():
-    return create_mnist_cnn()
-
-def get_batch_model(model_name):
-    if model_name == 'mnist_mlp':
-        model = create_mnist_mlp()
-        opt = Adam()
-        lossfun = categorical_crossentropy
-    elif model_name == 'mnist_cnn':
-        model = create_mnist_cnn()
-        opt = Adam()
-        lossfun = categorical_crossentropy
-    elif model_name == 'fashion_mlp':
-        model = create_fashion_mlp()
-        opt = Adam()
-        lossfun = categorical_crossentropy
-    elif model_name == 'fashion_cnn':
-        model = create_fashion_cnn()
-        opt = Adam()
-        lossfun = categorical_crossentropy
-    else:
-        raise Exception('unknown model was specified.')
-    return (model, opt, lossfun)
