@@ -9,8 +9,8 @@ import utils
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser()
-parser.add_argument('--result_dir', default=None)
-parser.add_argument('--model_dir', default=None)
+parser.add_argument('--result_out', default=None)
+parser.add_argument('--model_out', default=None)
 parser.add_argument(
     '--dataset',
     choices=['mnist', 'fashion', 'digits', 'boston'],
@@ -78,7 +78,7 @@ def main(args):
             print('test acc: %f' % test_acc)
 
     # save results
-    if args.result_dir:
+    if args.result_out:
         result = {
             'dataset': args.dataset,
             'epochs': args.epochs,
@@ -92,16 +92,16 @@ def main(args):
             'mean_pred_time': np.mean(pred_time_data)}
         if dataset.type == 'classification':
             result['mean_test_acc'] = np.mean(test_acc_data)
-        if os.path.exists(args.result_dir) == False:
-            os.makedirs(args.result_dir)
-        utils.save_result(result, args.result_dir)
+        if os.path.exists(args.result_out) == False:
+            os.makedirs(args.result_out)
+        utils.save_result(result, args.result_out)
 
     # save model
-    if args.model_dir:
-        if os.path.exists(args.model_dir) == False:
-            os.makedirs(args.model_dir)
+    if args.model_out:
+        if os.path.exists(args.model_out) == False:
+            os.makedirs(args.model_out)
         fname = 'm_%s_u%d_b%d.pkl' % (args.dataset, args.units, args.batch_size)
-        os_elm.save(os.path.join(args.model_dir, fname))
+        os_elm.save(os.path.join(args.model_out, fname))
 
 
 if __name__ == '__main__':
