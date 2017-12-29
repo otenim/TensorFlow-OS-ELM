@@ -11,11 +11,104 @@ This repository produces an implementation of Online Sequential Extreme Learning
 * Keras==2.1.1
 * scikit-learn==0.17.1
 
+All dependent libraries above can be installed with pip command.  
+
+## Usage
+
+We describe how to train OS-ELM and predict with it. For the sake of simplicity, we assume to use 'Mnist' as a dataset here.
+
+### 1. Instantiate model
+
+```python
+from models import OS_ELM
+
+INPUT_NODES=784 # Number of input nodes
+HIDDEN_NODES=1024 # Number of hidden nodes
+OUTPUT_NODES=10 # Number of output nodes
+BATCH_SIZE=128 # Batch size NOTE: not have to be fixed-length
+
+os_elm = OS_ELM(
+    inputs=INPUT_NODES,
+    units=HIDDEN_NODES,
+    outputs=OUTPUT_NODES,
+    activation='sigmoid', # 'sigmoid' or 'relu'
+    loss='mean_squared_error' # we support 'mean_squared_error' only
+)
+```
+
+### 2. Prepare dataset
+
+```python
+from datasets import Mnist
+
+# x_train: shape=(60000,784), dtype=float32, normalized in [0,1]
+# y_train: shape=(60000,10), dtype=float32, one-hot-vector format
+# x_test: shape=(10000,784), dtype=float32, normalized in [0,1]
+# y_test: shape=(10000,10), dtype=float32, one-hot-vector format
+
+dataset = Mnist()
+(x_train, y_train), (x_test, y_test) = dataset.load_data()
+
+# Separate training dataset for initial training phase
+# and sequential training phase.
+# NOTE: batch size of initial training dataset must be
+# much greater than the number of hidden units of os_elm.
+
+border = int(HIDDEN_NODES * 1.1)
+x_train_init, x_train_seq = x_train[:border], x_train[border:]
+y_train_init, y_train_seq = y_train[:border], y_train[border:]
+```
+
+### 3. Training
+
+```python
+# Initial training phase
+os_elm.init_train(x_train_init, y_train_init)
+
+# Sequential training phase
+for i in range(0, len(x_train_seq), BATCH_SIZE):
+    x = x_train_seq[i:i+BATCH_SIZE]
+    y = y_train_seq[i:i+BATCH_SIZE]
+    os_elm.seq_train(x,y)
+```
+
+### 4. Predict
+
+```python
+
+# 'forward' method just forward the input data and return the outputs
+# This method can be used for any type of problems.
+# out.shape = (10000,10)
+out = os_elm.forward(x_test)
+
+# 'classify' method forward the input data and return the probability
+# for each class.
+# NOTE: This method can only be used for classification problems.
+# out.shape = (10000,10)
+prob = os_elm.classify(x_test)
+```
+
+### 5. Evaluation
+
+```python
+
+# Compute loss
+# 'compute_loss' method can be used for any problems.
+loss = os_elm.compute_loss(x_test)
+
+# Compute accuracy
+# NOTE: 'compute_accuracy' method can only be used for classification problems
+acc = os_elm.compute_accuracy(x_test,y_test)
+
+print('test_loss: %f' % (loss))
+print('test_accuracy: %f' % (acc))
+```
+
 ## DEMO
 
 `$ python train.py [--dataset] [--units] [--batch_size] [--activation] [--loss]`  
 
-* `--result`: the path to the directory which saves results.
+* `--result`: path to the directory which saves results.
 * `--dataset`: 'mnist' or 'fashion' or 'digits' or 'boston'
     * 'fashion' means fashion\_mnist, and 'digits' is a small-size version mnist. 'boston' means boston\_housing dataset.
 * `--units`: number of hidden units.

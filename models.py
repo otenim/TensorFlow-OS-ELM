@@ -49,6 +49,12 @@ class OS_ELM(object):
         out = a1.dot(self.beta)
         return out
 
+    def forward(self, x):
+        return self(x)
+
+    def classify(self, x):
+        return self.__softmax(self(x))
+
     def compute_accuracy(self, x, y):
         out = self(x)
         acc = self.__accuracy(out, y)
