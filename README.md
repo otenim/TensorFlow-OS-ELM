@@ -110,7 +110,7 @@ It can be executed with the following command.
 
 ## DEMO
 
-`$ python train.py [--dataset] [--units] [--batch_size] [--activation] [--loss]`  
+`$ python train.py [--result] [--dataset] [--units] [--batch_size] [--activation] [--loss]`  
 
 * `--result`: path to the directory which saves results.
 * `--dataset`: 'mnist' or 'fashion' or 'digits' or 'boston'
@@ -121,7 +121,7 @@ It can be executed with the following command.
 * `--loss`: loss function to compute error. we only support 'mean\_squared\_error' for now.
 
 Following command is an example.  
-`$ python train.py --dataset mnist --units 1024 --batch_size 32 --activation sigmoid --loss mean_squared_error`
+`$ python train.py --result ./result --dataset mnist --units 1024 --batch_size 32 --activation sigmoid --loss mean_squared_error`
 
 ## Experimental results
 
