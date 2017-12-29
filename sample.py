@@ -1,26 +1,5 @@
-# OS-ELM-with-Python
-
-## Overview
-
-This repository produces an implementation of Online Sequential Extreme Learning Machine(OS-ELM) introduced in this [paper](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.217.1418&rep=rep1&type=pdf).
-
-## Dependencies
-
-* Python==3.5.2
-* Numpy==1.13.3
-* Keras==2.1.1
-* scikit-learn==0.17.1
-
-All dependent libraries above can be installed with pip command.  
-
-## Usage
-
-We describe how to train OS-ELM and predict with it. For the sake of simplicity, we assume to use 'Mnist' as a dataset here.
-
-### 1. Instantiate model
-
-```python
 from models import OS_ELM
+from datasets import Mnist
 
 INPUT_NODES=784 # Number of input nodes
 HIDDEN_NODES=1024 # Number of hidden nodes
@@ -34,18 +13,11 @@ os_elm = OS_ELM(
     activation='sigmoid', # 'sigmoid' or 'relu'
     loss='mean_squared_error' # we support 'mean_squared_error' only
 )
-```
-
-### 2. Prepare dataset
-
-```python
-from datasets import Mnist
 
 # x_train: shape=(60000,784), dtype=float32, normalized in [0,1]
 # y_train: shape=(60000,10), dtype=float32, one-hot-vector format
 # x_test: shape=(10000,784), dtype=float32, normalized in [0,1]
 # y_test: shape=(10000,10), dtype=float32, one-hot-vector format
-
 dataset = Mnist()
 (x_train, y_train), (x_test, y_test) = dataset.load_data()
 
@@ -57,24 +29,17 @@ dataset = Mnist()
 border = int(HIDDEN_NODES * 1.1)
 x_train_init, x_train_seq = x_train[:border], x_train[border:]
 y_train_init, y_train_seq = y_train[:border], y_train[border:]
-```
 
-### 3. Training
-
-```python
 # Initial training phase
+print('now initial training phase...')
 os_elm.init_train(x_train_init, y_train_init)
 
 # Sequential training phase
+print('now sequential training phase...')
 for i in range(0, len(x_train_seq), BATCH_SIZE):
     x = x_train_seq[i:i+BATCH_SIZE]
     y = y_train_seq[i:i+BATCH_SIZE]
     os_elm.seq_train(x,y)
-```
-
-### 4. Predict
-
-```python
 
 # 'forward' method just forward the input data and return the outputs
 # This method can be used for any type of problems.
@@ -86,11 +51,6 @@ out = os_elm.forward(x_test)
 # NOTE: This method can only be used for classification problems.
 # out.shape = (10000,10)
 prob = os_elm.classify(x_test)
-```
-
-### 5. Evaluation
-
-```python
 
 # Compute loss
 # 'compute_loss' method can be used for any problems.
@@ -102,27 +62,3 @@ acc = os_elm.compute_accuracy(x_test,y_test)
 
 print('test_loss: %f' % (loss))
 print('test_accuracy: %f' % (acc))
-```
-
-Above work processes are summarized in `sample.py`.  
-It can be executed with the following command.  
-`$ python sample.py`
-
-## DEMO
-
-`$ python train.py [--dataset] [--units] [--batch_size] [--activation] [--loss]`  
-
-* `--result`: path to the directory which saves results.
-* `--dataset`: 'mnist' or 'fashion' or 'digits' or 'boston'
-    * 'fashion' means fashion\_mnist, and 'digits' is a small-size version mnist. 'boston' means boston\_housing dataset.
-* `--units`: number of hidden units.
-* `--batch_size`: mini-batch size.
-* `--activation`: activation function to compute hidden nodes. we only support 'sigmoid' for now.
-* `--loss`: loss function to compute error. we only support 'mean\_squared\_error' for now.
-
-Following command is an example.  
-`$ python train.py --dataset mnist --units 1024 --batch_size 32 --activation sigmoid --loss mean_squared_error`
-
-## Experimental results
-
-see our [wiki](https://github.com/otenim/OS-ELM-with-Python/wiki)
