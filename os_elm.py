@@ -7,7 +7,7 @@ class OS_ELM(object):
     def __init__(
         self, n_input_nodes, n_hidden_nodes, n_output_nodes,
         activation='sigmoid', loss='mean_squared_error',
-        alpha_init=None, beta_init=None, bias_init=None):
+        alpha_init=None, beta_init=None, p_init=None, bias_init=None):
 
         # =====================================
         # Model architecture
@@ -30,7 +30,7 @@ class OS_ELM(object):
         # =====================================
         # Initialize Weights
         # =====================================
-        # check initial weight matrix for alpha
+        # alpha
         if alpha_init:
             if alpha_init.shape != (self.n_input_nodes, self.n_hidden_nodes):
                 raise ValueError(
@@ -46,7 +46,7 @@ class OS_ELM(object):
                 self.n_hidden_nodes
             ) * 2.0 - 1.0
 
-        # check initial weight matrix for beta
+        # beta
         if beta_init:
             if beta_init.shape != (self.n_input_nodes, self.n_hidden_nodes):
                 raise ValueError(
@@ -62,7 +62,7 @@ class OS_ELM(object):
                 n_output_nodes
             ) * 2.0 - 1.0
 
-        # check initial weight vector for bias
+        # bias
         if bias_init:
             if bias_init.shape != (self.n_hidden_nodes,):
                 raise ValueError(
@@ -74,6 +74,18 @@ class OS_ELM(object):
         else:
             # initialize with zeros
             self.bias = np.zeros(shape=(self.n_hidden_nodes))
+
+        # p
+        if p_init:
+            if p_init.shape != (self.n_hidden_nodes,self.n_hidden_nodes):
+                raise ValueError(
+                    'p_init.shape must be (n_hidden_nodes, n_hidden_nodes) = '
+                    '(%d, %d), but this time bias_init.shape = %s' \
+                        % (self.n_hidden_nodes, self.n_hidden_nodes, str(bias_init.shape))
+                )
+            self.p = bias_init
+        else:
+            self.p = None
 
     def __call__(self, x):
         h = x.dot(self.alpha) + self.bias
@@ -201,7 +213,7 @@ class OS_ELM(object):
             raise ValueError('unknown loss function \'%s\' was given.' % name)
 
 def load_model(filepath):
-    with open(filepath, 'r') as f:
+    with open(filepath, 'rb') as f:
         params = pkl.load(f)
         os_elm = OS_ELM(
             n_input_nodes=params['n_input_nodes'],
@@ -212,6 +224,6 @@ def load_model(filepath):
             alpha_init=params['alpha'],
             beta_init=params['beta'],
             bias_init=params['bias'],
-            p_init=params['p']
+            p_init=params['p'],
         )
-        return
+    return os_elm

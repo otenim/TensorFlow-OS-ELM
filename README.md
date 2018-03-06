@@ -28,7 +28,9 @@ All requsite libraries above can be installed in the following command.
 
 ## Usage
 
-We describe how to train OS-ELM and predict with it. For the sake of simplicity, we assume to use 'Mnist' as a dataset here.
+Here, we describe how to train OS-ELM and predict with the trained model.  
+For the sake of simplicity, we assume to train a model on 'MNIST' dataset.  
+The following example shows a standard code pipeline for the use case.
 
 ### 1. Instantiate model
 

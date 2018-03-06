@@ -1,6 +1,6 @@
 from keras.datasets import mnist
 from keras.utils import to_categorical
-from os_elm import OS_ELM
+from os_elm import OS_ELM, load_model
 import numpy as np
 import argparse
 
@@ -34,12 +34,22 @@ def main(args):
     # ===========================================
     # Instantiate os-elm
     # ===========================================
+
     os_elm = OS_ELM(
-        n_input_nodes=n_input_dimensions, # 784
-        n_hidden_nodes=args.n_hidden_nodes, # user define
+        # number of nodes of input layer
+        n_input_nodes=n_input_dimensions,
+        # number of nodes of hidden layer
+        n_hidden_nodes=args.n_hidden_nodes,
+        # number of nodes of output layer
         n_output_nodes=n_classes, # 10
-        activation=args.activation, # support 'sigmoid' and 'linear' so far
-        loss=args.loss, # support 'mean_squared_error' and 'mean_absolute_error' so far
+        # activation function
+        # support 'sigmoid' and 'linear' so far.
+        # the default value is 'sigmoid'.
+        activation=args.activation,
+        # loss function
+        # support 'mean_squared_error' and 'mean_absolute_error' so far.
+        # the default value is 'mean_squared_error'.
+        loss=args.loss
     )
 
 
@@ -60,14 +70,21 @@ def main(args):
     y_train_seq = y_train[border:]
 
     # initial training phase
-    os_elm.init_train(x_train_init, y_train_init)
+    os_elm.init_train(
+        x_train_init,
+        y_train_init
+    )
 
     # sequential training phase
     os_elm.seq_train(
         x_train_seq,
         y_train_seq,
-        batch_size=args.batch_size, # batch size during training
-        verbose=1, # whether to show a progress bar or not
+        # batch size during sequential training phase
+        # the default value is 32.
+        batch_size=args.batch_size,
+        # whether to show a progress bar or not
+        # the default value is 1.
+        verbose=1,
     )
 
     # ===========================================
@@ -79,31 +96,44 @@ def main(args):
     # the input sample's shape must be (1, n_input_nodes), not
     # (n_input_nodes,). Here, we feed one validation sample
     # as an example.
-    x = x_test[0]
-    x = np.expand_dims(x, axis=0)
+    n = 5
+    x = x_test[:n]
     y_pred = os_elm.predict(x, softmax=True)
-    class_id = np.argmax(y_pred[0])
-    print("class_id (prediction): %d" % class_id)
-    print("class_id (true): %d" % np.argmax(y_test[0]))
 
-    class_prob = y_pred[0][class_id]
-    print("probability (prediction): %.3f" % class_prob)
+    for i in range(n):
+        print("========== Prediction result (%d) ==========" % i)
+        class_id = np.argmax(y_pred[i])
+        print("class_id (prediction): %d" % class_id)
+        print("class_id (true): %d" % np.argmax(y_test[i]))
+        class_prob = y_pred[i][class_id]
+        print("probability (prediction): %.3f" % class_prob)
 
     # ===========================================
     # Evaluation
     # ===========================================
-    loss, acc = os_elm.evaluate(x_test, y_test, metrics=['loss', 'accuracy'])
+    print("========== Evaluation result ==========")
+    loss, acc = os_elm.evaluate(
+        x_test,
+        y_test,
+        # 'loss' and 'accuracy' are supported so far.
+        # the default value is ['loss']
+        # NOTE: 'accuracy' is only available for classification problems.
+        metrics=['loss', 'accuracy']
+    )
     print('validation loss: %f' % loss)
     print('classification accuracy: %f' % acc)
 
     # ===========================================
     # Save model
     # ===========================================
+    print("saving trained model as model.pkl...")
     os_elm.save('model.pkl')
 
     # ===========================================
     # Load model
     # ===========================================
+    print('loading model froom model.pkl...')
+    os_elm = load_model('model.pkl')
 
 if __name__ == '__main__':
     args = parser.parse_args()
