@@ -2,6 +2,8 @@
 
 ## Overview
 
+![fig2](https://i.imgur.com/GckJu86.png)
+
 In this repository, we produce an implementation of Online Sequential
 Extreme Machin (OS-ELM) introduced by Liang et al. in 2006.
 OS-ELM is known to be able to trian faster and always converge to the global optimal solution.
@@ -176,6 +178,10 @@ if __name__ == '__main__':
 ```
 
 ## Notes
+
+The following figure shows OS-ELM training formula.  
+
+![fig1](https://i.imgur.com/QjqaMcS.png)
 
 * OS-ELM always converge to the global optimal solutions, while backpropagation-based neural networks
 tend to suffer from local minima problem.
