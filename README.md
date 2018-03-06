@@ -32,112 +32,166 @@ Here, we describe how to train OS-ELM and predict with the trained model.
 For the sake of simplicity, we assume to train a model on 'MNIST' dataset.  
 The following example shows a standard code pipeline for the use case.
 
-### 1. Instantiate model
-
 ```python
-from models import OS_ELM
+from keras.datasets import mnist
+from keras.utils import to_categorical
+from os_elm import OS_ELM, load_model
+import numpy as np
+import argparse
 
-INPUT_NODES=784 # Number of input nodes
-HIDDEN_NODES=1024 # Number of hidden nodes
-OUTPUT_NODES=10 # Number of output nodes
-BATCH_SIZE=128 # Batch size NOTE: not have to be fixed-length
+parser = argparse.ArgumentParser()
+parser.add_argument('--n_hidden_nodes', type=int, default=256)
+parser.add_argument('--batch_size', type=int, default=32)
+parser.add_argument('--activation',
+    choices=['sigmoid','linear'], default='sigmoid')
+parser.add_argument('--loss',
+    choices=['mean_squared_error', 'mean_absolute_error'], default='mean_squared_error')
 
-os_elm = OS_ELM(
-    inputs=INPUT_NODES,
-    units=HIDDEN_NODES,
-    outputs=OUTPUT_NODES,
-    activation='sigmoid', # 'sigmoid' or 'relu'
-    loss='mean_squared_error' # we support 'mean_squared_error' only
-)
+def main(args):
+
+    # ===========================================
+    # Prepare dataset
+    # ===========================================
+    n_input_dimensions = 784
+    n_classes = 10
+
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    # normalize pixel values of input images within [0,1]
+    x_train = x_train.astype(np.float32) / 255.
+    x_test = x_test.astype(np.float32) / 255.
+    # reshape
+    x_train = x_train.reshape(-1,n_input_dimensions)
+    x_test = x_test.reshape(-1,n_input_dimensions)
+    # transform label data in one-hot-vector format
+    y_train = to_categorical(y_train, num_classes=n_classes)
+    y_test = to_categorical(y_test, num_classes=n_classes)
+
+    # ===========================================
+    # Instantiate os-elm
+    # ===========================================
+
+    os_elm = OS_ELM(
+        # number of nodes of input layer
+        n_input_nodes=n_input_dimensions,
+        # number of nodes of hidden layer
+        n_hidden_nodes=args.n_hidden_nodes,
+        # number of nodes of output layer
+        n_output_nodes=n_classes, # 10
+        # activation function
+        # support 'sigmoid' and 'linear' so far.
+        # the default value is 'sigmoid'.
+        activation=args.activation,
+        # loss function
+        # support 'mean_squared_error' and 'mean_absolute_error' so far.
+        # the default value is 'mean_squared_error'.
+        loss=args.loss
+    )
+
+
+    # ===========================================
+    # training
+    # ===========================================
+    # devide x_train into two dataset.
+    # the one is for initial training phase,
+    # the other is for sequential training phase.
+    # NOTE: number of data samples for initial training phase
+    # should be much greater than os_elm.n_hidden_nodes.
+    # here, we set 1.1 * os_elm.n_hidden_nodes as the
+    # number of data samples for initial training phase.
+    border = int(1.1 * os_elm.n_hidden_nodes)
+    x_train_init = x_train[:border]
+    y_train_init = y_train[:border]
+    x_train_seq = x_train[border:]
+    y_train_seq = y_train[border:]
+
+    # initial training phase
+    os_elm.init_train(
+        x_train_init,
+        y_train_init
+    )
+
+    # sequential training phase
+    os_elm.seq_train(
+        x_train_seq,
+        y_train_seq,
+        # batch size during sequential training phase
+        # the default value is 32.
+        batch_size=args.batch_size,
+        # whether to show a progress bar or not
+        # the default value is 1.
+        verbose=1,
+    )
+
+    # ===========================================
+    # Prediction
+    # ===========================================
+    # NOTE: input numpy arrays' shape is always assumed to
+    # be in the following 2D format: (batch_size, n_input_nodes).
+    # Even when you feed one training sample to the model,
+    # the input sample's shape must be (1, n_input_nodes), not
+    # (n_input_nodes,). Here, we feed one validation sample
+    # as an example.
+    n = 5
+    x = x_test[:n]
+    y_pred = os_elm.predict(x, softmax=True)
+
+    for i in range(n):
+        print("========== Prediction result (%d) ==========" % i)
+        class_id = np.argmax(y_pred[i])
+        print("class_id (prediction): %d" % class_id)
+        print("class_id (true): %d" % np.argmax(y_test[i]))
+        class_prob = y_pred[i][class_id]
+        print("probability (prediction): %.3f" % class_prob)
+
+    # ===========================================
+    # Evaluation
+    # ===========================================
+    print("========== Evaluation result ==========")
+    loss, acc = os_elm.evaluate(
+        x_test,
+        y_test,
+        # 'loss' and 'accuracy' are supported so far.
+        # the default value is ['loss']
+        # NOTE: 'accuracy' is only available for classification problems.
+        metrics=['loss', 'accuracy']
+    )
+    print('validation loss: %f' % loss)
+    print('classification accuracy: %f' % acc)
+
+    # ===========================================
+    # Save model
+    # ===========================================
+    print("saving trained model as model.pkl...")
+    os_elm.save('model.pkl')
+
+    # ===========================================
+    # Load model
+    # ===========================================
+    print('loading model froom model.pkl...')
+    os_elm = load_model('model.pkl')
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+    main(args)
 ```
 
 ### 2. Prepare dataset
 
-```python
-from datasets import Mnist
+The above code is summarized in train_mnist.py. Here, we describe how to
+execute the script.
 
-# x_train: shape=(60000,784), dtype=float32, normalized in [0,1]
-# y_train: shape=(60000,10), dtype=float32, one-hot-vector format
-# x_test: shape=(10000,784), dtype=float32, normalized in [0,1]
-# y_test: shape=(10000,10), dtype=float32, one-hot-vector format
+`$ python train_mnist.py [--n_hidden_nodes] [--batch_size] [--activation] [--loss]`
 
-dataset = Mnist()
-(x_train, y_train), (x_test, y_test) = dataset.load_data()
+* [optional] `--n_hidden_nodes`: number of nodes of hidden layer.
+the default value is set to 512.
+* [optional] `--batch_size`: batch size during sequential training phase.
+the default value is set to 32.
+* [optional] `--activation`: activation function to be applied in hidden nodes.
+we support 'sigmoid' and 'linear' so far. the default value is set to 'sigmoid'.
+* [optional] '--loss': loss function to be applied in model's output.
+we support 'mean_squared_error' and 'mean_absolute_error' so far.
+the default value is set to 'mean_squared_error'.
 
-# Separate training dataset for initial training phase
-# and sequential training phase.
-# NOTE: batch size of initial training dataset must be
-# much greater than the number of hidden units of os_elm.
+The following command is an example.
 
-border = int(HIDDEN_NODES * 1.1)
-x_train_init, x_train_seq = x_train[:border], x_train[border:]
-y_train_init, y_train_seq = y_train[:border], y_train[border:]
-```
-
-### 3. Training
-
-```python
-# Initial training phase
-os_elm.init_train(x_train_init, y_train_init)
-
-# Sequential training phase
-for i in range(0, len(x_train_seq), BATCH_SIZE):
-    x = x_train_seq[i:i+BATCH_SIZE]
-    y = y_train_seq[i:i+BATCH_SIZE]
-    os_elm.seq_train(x,y)
-```
-
-### 4. Predict
-
-```python
-
-# 'forward' method just forward the input data and return the outputs
-# This method can be used for any type of problems.
-# out.shape = (10000,10)
-out = os_elm.forward(x_test)
-
-# 'classify' method forward the input data and return the probability
-# for each class.
-# NOTE: This method can only be used for classification problems.
-# out.shape = (10000,10)
-prob = os_elm.classify(x_test)
-```
-
-### 5. Evaluation
-
-```python
-
-# Compute loss
-# 'compute_loss' method can be used for any problems.
-loss = os_elm.compute_loss(x_test,y_test)
-
-# Compute accuracy
-# NOTE: 'compute_accuracy' method can only be used for classification problems
-acc = os_elm.compute_accuracy(x_test,y_test)
-
-print('test_loss: %f' % (loss))
-print('test_accuracy: %f' % (acc))
-```
-
-Above work processes are summarized in `sample.py`.  
-It can be executed with the following command.  
-`$ python sample.py`
-
-## DEMO
-
-`$ python train.py [--result] [--dataset] [--units] [--batch_size] [--activation] [--loss]`  
-
-* `--result`: path to the directory which saves results.
-* `--dataset`: 'mnist' or 'fashion' or 'digits' or 'boston'
-    * 'fashion' means fashion\_mnist, and 'digits' is a small-size version mnist. 'boston' means boston\_housing dataset.
-* `--units`: number of hidden units.
-* `--batch_size`: mini-batch size.
-* `--activation`: activation function to compute hidden nodes. we only support 'sigmoid' for now.
-* `--loss`: loss function to compute error. we only support 'mean\_squared\_error' for now.
-
-Following command is an example.  
-`$ python train.py --result ./result --dataset mnist --units 1024 --batch_size 32 --activation sigmoid --loss mean_squared_error`
-
-## Experimental results
-
-see our [wiki](https://github.com/otenim/OS-ELM-with-Python/wiki)
+`$ python train.py --n_hidden_nodes 512 --batch_size 32 --activation sigmoid --loss mean_squared_error`

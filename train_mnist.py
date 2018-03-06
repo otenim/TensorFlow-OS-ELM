@@ -5,7 +5,7 @@ import numpy as np
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--n_hidden_nodes', type=int, default=256)
+parser.add_argument('--n_hidden_nodes', type=int, default=512)
 parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--activation',
     choices=['sigmoid','linear'], default='sigmoid')
