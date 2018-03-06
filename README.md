@@ -2,16 +2,24 @@
 
 ## Overview
 
-This repository produces an implementation of Online Sequential Extreme Learning Machine(OS-ELM) introduced in this [paper](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.217.1418&rep=rep1&type=pdf).
+In this repository, we produce an implementation of Online Sequential
+Extreme Machin (OS-ELM) introduced by Liang et al. in 2006.
+OS-ELM is known to be able to train faster and more accurately than
+the other sequential learning algorithms including
+backpropagation-based neural networks.  
+
+[Paper](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.217.1418&rep=rep1&type=pdf).
 
 ## Dependencies
 
-* Python==3.5.2
-* Numpy==1.13.3
-* Keras==2.1.1
-* scikit-learn==0.17.1
+* Python==3.5, 3.6
+* Numpy==1.13, 1.14
+* Keras==2.1
+* scikit-learn==0.18
 
-All dependent libraries above can be installed with pip command.  
+All requsite libraries above can be installed in the following command.
+
+`$ pip install -U numpy Keras scikit-learn`
 
 ## Usage
 
