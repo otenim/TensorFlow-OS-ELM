@@ -4,9 +4,9 @@
 
 In this repository, we produce an implementation of Online Sequential
 Extreme Machin (OS-ELM) introduced by Liang et al. in 2006.
-OS-ELM is known to be able to train faster and more accurately than
-the other sequential learning algorithms including
-backpropagation-based neural networks.
+OS-ELM is known to be able to trian faster and always converge to the global optimal solution.
+Also, since OS-ELM has smaller number of hyperparameters than backpropagation-based
+neural networks, it can provide a high generalization performance.
 
 [Paper](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.217.1418&rep=rep1&type=pdf).
 
@@ -175,7 +175,18 @@ if __name__ == '__main__':
     main(args)
 ```
 
-### 2. Prepare dataset
+## Notes
+
+* OS-ELM always converge to the global optimal solutions, while backpropagation-based neural networks
+tend to suffer from local minima problem.
+* OS-ELM does not need to train iteratively on the same data samples.
+Even if you did it, the computational result will not change at all.
+* OS-ELM does not need to compute gradients. The weights are trained by
+computing some matrix multipies and a matrix inversion.
+* The computational complexity for the matrix inversion is O(batch_size^3),
+so take care for the cost when you increase batch_size.
+
+## Demo
 
 The above code is summarized in train_mnist.py. Here, we describe how to
 execute the script.
