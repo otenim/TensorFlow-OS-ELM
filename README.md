@@ -6,7 +6,7 @@ In this repository, we produce an implementation of Online Sequential
 Extreme Machin (OS-ELM) introduced by Liang et al. in 2006.
 OS-ELM is known to be able to train faster and more accurately than
 the other sequential learning algorithms including
-backpropagation-based neural networks.  
+backpropagation-based neural networks.
 
 [Paper](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.217.1418&rep=rep1&type=pdf).
 
