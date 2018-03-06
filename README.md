@@ -199,7 +199,7 @@ the default value is set to 512.
 the default value is set to 32.
 * [optional] `--activation`: activation function to be applied in hidden nodes.
 we support 'sigmoid' and 'linear' so far. the default value is set to 'sigmoid'.
-* [optional] '--loss': loss function to be applied in model's output.
+* [optional] `--loss`: loss function to be applied in model's output.
 we support 'mean_squared_error' and 'mean_absolute_error' so far.
 the default value is set to 'mean_squared_error'.
 
