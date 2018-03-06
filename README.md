@@ -4,8 +4,8 @@
 
 ![fig2](https://i.imgur.com/GckJu86.png)
 
-In this repository, we produce an implementation of Online Sequential
-Extreme Machin (OS-ELM) introduced by Liang et al. in 2006.
+In this repository, we provide an implementation of Online Sequential
+Extreme Machine (OS-ELM) introduced by Liang et al. in 2006.
 OS-ELM is known to be able to trian faster and always converge to the global optimal solution.
 Also, since OS-ELM has smaller number of hyperparameters than backpropagation-based
 neural networks, it can provide a high generalization performance.
@@ -212,3 +212,9 @@ the default value is set to 'mean_squared_error'.
 The following command is an example.
 
 `$ python train.py --n_hidden_nodes 512 --batch_size 32 --activation sigmoid --loss mean_squared_error`
+
+## Todos
+
+* support more activation functions
+* support more loss functions
+* provide GPU implementation using CuPy
