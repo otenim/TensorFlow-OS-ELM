@@ -4,3 +4,4 @@ weights/*
 datasets/*
 results/*
 models/*
+*.pkl

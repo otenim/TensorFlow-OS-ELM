@@ -5,7 +5,7 @@ import numpy as np
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--n_hidden_nodes', type=int, default=1024)
+parser.add_argument('--n_hidden_nodes', type=int, default=256)
 parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--activation',
     choices=['sigmoid','linear'], default='sigmoid')
@@ -83,10 +83,11 @@ def main(args):
     x = np.expand_dims(x, axis=0)
     y_pred = os_elm.predict(x, softmax=True)
     class_id = np.argmax(y_pred[0])
-    class_prob = y_pred[0][class_id]
     print("class_id (prediction): %d" % class_id)
-    print("probability (prediction): %.3f" % class_prob)
     print("class_id (true): %d" % np.argmax(y_test[0]))
+
+    class_prob = y_pred[0][class_id]
+    print("probability (prediction): %.3f" % class_prob)
 
     # ===========================================
     # Evaluation

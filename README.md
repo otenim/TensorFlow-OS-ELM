@@ -10,12 +10,17 @@ backpropagation-based neural networks.
 
 [Paper](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.217.1418&rep=rep1&type=pdf).
 
-## Dependencies
+## Requsite Libraries
 
-* Python==3.5, 3.6
-* Numpy==1.13, 1.14
-* Keras==2.1
-* scikit-learn==0.18
+We tested our codes using the following libraries.
+
+* Python==3.6.0
+* Numpy==1.14.1
+* Keras==2.1.4
+* scikit-learn==0.17.1
+
+You don't have to use the exactly same version of the each library,
+but we can't guarantee codes work well in that case.
 
 All requsite libraries above can be installed in the following command.
 
