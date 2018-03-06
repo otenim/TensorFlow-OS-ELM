@@ -218,3 +218,4 @@ The following command is an example.
 * support more activation functions
 * support more loss functions
 * provide GPU implementation using CuPy
+* provide benchmark results
