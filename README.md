@@ -2,7 +2,9 @@
 
 ## Overview
 
-<img src="https://i.imgur.com/GckJu86.png" width=500>
+<div align="center">
+    <img src="https://i.imgur.com/GckJu86.png" width=500>
+</div>
 
 In this repository, we provide an implementation of Online Sequential
 Extreme Machine (OS-ELM) introduced by Liang et al. in 2006.
@@ -181,7 +183,9 @@ if __name__ == '__main__':
 
 The following figure shows OS-ELM training formula.  
 
-<img src="https://i.imgur.com/QjqaMcS.png" width=500>
+<div align="center">
+    <img src="https://i.imgur.com/QjqaMcS.png" width=500>
+</div>
 
 * OS-ELM always converge to the global optimal solutions, while backpropagation-based neural networks
 tend to suffer from local minima problem.
