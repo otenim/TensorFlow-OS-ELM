@@ -36,12 +36,12 @@ class OS_ELM(object):
         self.__x = tf.placeholder(tf.float32, shape=(None, self.__n_input_nodes), name='x')
         self.__t = tf.placeholder(tf.float32, shape=(None, self.__n_output_nodes), name='t')
         self.__alpha = tf.constant(
-            np.random.uniform(-1,1,size=(self.__n_input_nodes, self.__n_hidden_nodes)),
+            np.random.uniform(-1., 1., size=(self.__n_input_nodes, self.__n_hidden_nodes)),
             dtype=tf.float32,
             name='alpha',
         )
         self.__bias = tf.constant(
-            np.zeros(shape=(self.__n_hidden_nodes)),
+            np.random.uniform(-1., 1., size=(self.__n_hidden_nodes)),
             dtype=tf.float32,
             name='bias',
         )
@@ -59,7 +59,13 @@ class OS_ELM(object):
         )
 
         # Predict
-        self.__predict = self.__activation(tf.matmul(self.__x, self.__alpha) + self.__bias)
+        self.__predict = tf.matmul(self.__activation(tf.matmul(self.__x, self.__alpha) + self.__bias), self.__beta)
+
+        # Loss
+        self.__loss = self.__loss(self.__t, self.__predict)
+
+        # Accuracy
+        self.__accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(self.__predict, 1), tf.argmax(self.__t, 1)), tf.float32))
 
         # Initial training phase
         self.__init_train_p, self.__init_train_beta = self.__build_init_train_graph()
@@ -73,45 +79,44 @@ class OS_ELM(object):
     def predict(self, x):
         return self.__sess.run(self.__predict, feed_dict={self.__x: x})
 
-    def fit(self, x, t, batch_size=16, verbose=1):
+    def evaluate(self, x, t, metrics=['loss']):
+        ret = []
+        for metric in metrics:
+            if metric == 'loss':
+                loss =  self.__sess.run(self.__loss, feed_dict={self.__x: x, self.__t: t})
+                ret.append(loss)
+            elif metric == 'accuracy':
+                accuracy = self.__sess.run(self.__accuracy, feed_dict={self.__x: x, self.__t: t})
+                ret.append(accuracy)
+            else:
+                continue
+        return ret
 
-        if verbose:
-            pbar = tqdm.tqdm(total=len(x))
 
+    def init_train(self, x, t):
+        if self.__is_finished_init_train:
+            raise Exception(
+                'the initial training phase has already finished. '
+                'please call \'seq_train\' method or \'fit\' method for further training.'
+            )
+        if len(x) < self.__n_hidden_nodes:
+            raise ValueError(
+                'in the initial training phase, the number of training samples '
+                'must be greater than the number of hidden nodes.'
+            )
+        self.__sess.run(self.__init_train_p, feed_dict={self.__x: x})
+        self.__sess.run(self.__init_train_beta, feed_dict={self.__x: x, self.__t: t})
+        self.__is_finished_init_train = True
+
+    def seq_train(self, x, t):
         if self.__is_finished_init_train == False:
-            if verbose:
-                pbar.set_description('initial training phase')
-            if len(x) < self.__n_hidden_nodes:
-                raise ValueError(
-                    'If this is the first time for you to train the model, '
-                    'the number of training samples '
-                    'must be greater than the number of hidden nodes.'
-                )
-            x_init = x[:self.__n_hidden_nodes]
-            t_init = t[:self.__n_hidden_nodes]
-            self.__sess.run(self.__init_train_p, feed_dict={self.__x: x_init})
-            self.__sess.run(self.__init_train_beta, feed_dict={self.__x: x_init, self.__t: t_init})
-            self.__is_finished_init_train = True
-            if verbose:
-                pbar.update(n=len(x_init))
-            x_seq = x[self.__n_hidden_nodes:]
-            t_seq = t[self.__n_hidden_nodes:]
-        else:
-            x_seq = x
-            t_seq = t
-
-        if verbose:
-            pbar.set_description('sequential training phase')
-        for i in range(0, len(x_seq), batch_size):
-            x_batch = x_seq[i:i+batch_size]
-            t_batch = t_seq[i:i+batch_size]
-            self.__sess.run(self.__seq_train_p, feed_dict={self.__x: x_batch})
-            self.__sess.run(self.__seq_train_beta, feed_dict={self.__x: x_batch, self.__t: t_batch})
-            if verbose:
-                pbar.update(n=len(x_batch))
-
-        if verbose:
-            pbar.close()
+            raise Exception(
+                'you have not finished the initial training phase. '
+                'please initialize the model\'s weights by \'init_train\' '
+                'or \'fit\' method before calling \'seq_train\' method.'
+            )
+        self.__sess.run(self.__seq_train_p, feed_dict={self.__x: x})
+        self.__sess.run(self.__seq_train_beta, feed_dict={self.__x: x, self.__t: t})
 
     def __build_init_train_graph(self):
         H = self.__activation(tf.matmul(self.__x, self.__alpha) + self.__bias)

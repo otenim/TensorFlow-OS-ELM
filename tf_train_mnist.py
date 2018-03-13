@@ -4,6 +4,7 @@ from tf_os_elm import OS_ELM
 import numpy as np
 import argparse
 import tensorflow as tf
+import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--n_hidden_nodes', type=int, default=1024)
@@ -28,6 +29,13 @@ def main(args):
     t_train = t_train.astype(np.float32)
     t_test = t_test.astype(np.float32)
 
+    border = int(1.5 * args.n_hidden_nodes)
+    x_train_init = x_train[:border]
+    x_train_seq = x_train[border:]
+    t_train_init = t_train[:border]
+    t_train_seq = t_train[border:]
+
+
     # ===========================================
     # Instantiate os-elm
     # ===========================================
@@ -44,57 +52,23 @@ def main(args):
     # ===========================================
     # training
     # ===========================================
-    os_elm.fit(x_train, t_train, batch_size=args.batch_size, verbose=1)
+    # initial training phase
+    pbar = tqdm.tqdm(total=len(x_train), desc='initial training phase')
+    os_elm.init_train(x_train_init, t_train_init)
+    pbar.update(n=len(x_train_init))
 
-    """
-    # ===========================================
-    # Prediction
-    # ===========================================
-    # NOTE: input numpy arrays' shape is always assumed to
-    # be in the following 2D format: (batch_size, n_input_nodes).
-    # Even when you feed one training sample to the model,
-    # the input sample's shape must be (1, n_input_nodes), not
-    # (n_input_nodes,). Here, we feed one validation sample
-    # as an example.
-    n = 5
-    x = x_test[:n]
-    y_pred = os_elm.predict(x, softmax=True)
+    # sequential training phase
+    pbar.set_description('sequential training phase')
+    for i in range(0, len(x_train_seq), args.batch_size):
+        x_batch = x_train_seq[i:i+args.batch_size]
+        t_batch = t_train_seq[i:i+args.batch_size]
+        os_elm.seq_train(x_batch, t_batch)
+        pbar.update(n=len(x_batch))
+    pbar.close()
 
-    for i in range(n):
-        print("========== Prediction result (%d) ==========" % i)
-        class_id = np.argmax(y_pred[i])
-        print("class_id (prediction): %d" % class_id)
-        print("class_id (true): %d" % np.argmax(t_test[i]))
-        class_prob = y_pred[i][class_id]
-        print("probability (prediction): %.3f" % class_prob)
-
-    # ===========================================
-    # Evaluation
-    # ===========================================
-    print("========== Evaluation result ==========")
-    loss, acc = os_elm.evaluate(
-        x_test,
-        t_test,
-        # 'loss' and 'accuracy' are supported so far.
-        # the default value is ['loss']
-        # NOTE: 'accuracy' is only available for classification problems.
-        metrics=['loss', 'accuracy']
-    )
-    print('validation loss: %f' % loss)
-    print('classification accuracy: %f' % acc)
-
-    # ===========================================
-    # Save model
-    # ===========================================
-    print("saving trained model as model.pkl...")
-    os_elm.save('model.pkl')
-
-    # ===========================================
-    # Load model
-    # ===========================================
-    print('loading model froom model.pkl...')
-    os_elm = load_model('model.pkl')
-    """
+    result = os_elm.evaluate(x_test, t_test, metrics=['loss', 'accuracy'])
+    loss, accuracy = result[0], result[1]
+    print('val_loss: %f, val_accuracy: %f' % (loss, accuracy))
 
 if __name__ == '__main__':
     args = parser.parse_args()
