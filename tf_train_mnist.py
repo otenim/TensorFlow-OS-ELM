@@ -66,8 +66,7 @@ def main(args):
         pbar.update(n=len(x_batch))
     pbar.close()
 
-    result = os_elm.evaluate(x_test, t_test, metrics=['loss', 'accuracy'])
-    loss, accuracy = result[0], result[1]
+    [loss, accuracy] = os_elm.evaluate(x_test, t_test, metrics=['loss', 'accuracy'])
     print('val_loss: %f, val_accuracy: %f' % (loss, accuracy))
 
 if __name__ == '__main__':
