@@ -31,10 +31,6 @@ def main(args):
     # ===========================================
     # Instantiate os-elm
     # ===========================================
-    print(x_train.shape)
-    print(x_test.shape)
-    print(t_train.shape)
-    print(t_test.shape)
     os_elm = OS_ELM(
         # number of nodes of input layer
         n_input_nodes=n_input_dimensions,
@@ -49,7 +45,6 @@ def main(args):
     # training
     # ===========================================
     os_elm.fit(x_train, t_train, batch_size=args.batch_size, verbose=1)
-    sess.close()
 
     """
     # ===========================================

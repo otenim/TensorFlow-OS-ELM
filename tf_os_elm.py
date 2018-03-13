@@ -46,9 +46,7 @@ class OS_ELM(object):
         self.__seq_train_p, self.__seq_train_beta = self.__build_seq_train_graph()
 
         # Initialize variables
-        variables = [self.__p, self.__beta]
-        for var in variables:
-            self.__sess.run(var.initializer)
+        self.__sess.run(tf.global_variables_initializer())
 
     def predict(self, x):
         return self.__sess.run(self.__predict, feed_dict={self.__x: x})
@@ -70,7 +68,7 @@ class OS_ELM(object):
             x_init = x[:self.__n_hidden_nodes]
             t_init = t[:self.__n_hidden_nodes]
             self.__sess.run(self.__init_train_p, feed_dict={self.__x: x_init})
-            self.__sess.run(self.__init_train_beta, feed_dict={self.__t: t_init})
+            self.__sess.run(self.__init_train_beta, feed_dict={self.__x: x_init, self.__t: t_init})
             self.__is_finished_init_train = True
             if verbose:
                 pbar.update(n=len(x_init))
@@ -86,7 +84,7 @@ class OS_ELM(object):
             x_batch = x_seq[i:i+batch_size]
             t_batch = t_seq[i:i+batch_size]
             self.__sess.run(self.__seq_train_p, feed_dict={self.__x: x_batch})
-            self.__sess.run(self.__seq_train_beta, feed_dict={self.__t: t_batch})
+            self.__sess.run(self.__seq_train_beta, feed_dict={self.__x: x_batch, self.__t: t_batch})
             if verbose:
                 pbar.update(n=len(x_batch))
 
