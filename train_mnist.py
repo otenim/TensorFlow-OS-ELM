@@ -1,6 +1,6 @@
 from keras.datasets import mnist
 from keras.utils import to_categorical
-from tf_os_elm import OS_ELM
+from os_elm import OS_ELM
 import numpy as np
 import argparse
 import tensorflow as tf

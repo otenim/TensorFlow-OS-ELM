@@ -4,7 +4,13 @@ import tensorflow as tf
 
 class OS_ELM(object):
 
-    def __init__(self, n_input_nodes, n_hidden_nodes, n_output_nodes, activation='sigmoid', loss='mean_squared_error'):
+    def __init__(
+        self, n_input_nodes, n_hidden_nodes, n_output_nodes,
+        activation='sigmoid', loss='mean_squared_error', name=None):
+        if name == None:
+            self.name = 'model'
+        else:
+            self.name = name
         self.__sess = tf.Session()
         self.__is_finished_init_train = False
         self.__n_input_nodes = n_input_nodes
@@ -68,10 +74,10 @@ class OS_ELM(object):
         self.__accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(self.__predict, 1), tf.argmax(self.__t, 1)), tf.float32))
 
         # Initial training phase
-        self.__init_train_p, self.__init_train_beta = self.__build_init_train_graph()
+        self.__init_train = self.__build_init_train_graph()
 
         # Sequential training phase
-        self.__seq_train_p, self.__seq_train_beta = self.__build_seq_train_graph()
+        self.__seq_train = self.__build_seq_train_graph()
 
         # Initialize variables
         self.__sess.run(tf.global_variables_initializer())
@@ -97,36 +103,35 @@ class OS_ELM(object):
         if self.__is_finished_init_train:
             raise Exception(
                 'the initial training phase has already finished. '
-                'please call \'seq_train\' method or \'fit\' method for further training.'
+                'please call \'seq_train\' method for further training.'
             )
         if len(x) < self.__n_hidden_nodes:
             raise ValueError(
                 'in the initial training phase, the number of training samples '
-                'must be greater than the number of hidden nodes.'
+                'must be greater than the number of hidden nodes. '
+                'But this time len(x) = %d, while n_hidden_nodes = %d' % (len(x), self.__n_hidden_nodes)
             )
-        self.__sess.run(self.__init_train_p, feed_dict={self.__x: x})
-        self.__sess.run(self.__init_train_beta, feed_dict={self.__x: x, self.__t: t})
+        self.__sess.run(self.__init_train, feed_dict={self.__x: x, self.__t: t})
         self.__is_finished_init_train = True
 
     def seq_train(self, x, t):
         if self.__is_finished_init_train == False:
             raise Exception(
-                'you have not finished the initial training phase. '
-                'please initialize the model\'s weights by \'init_train\' '
-                'or \'fit\' method before calling \'seq_train\' method.'
+                'you have not gone through the initial training phase yet. '
+                'please first initialize the model\'s weights by \'init_train\' '
+                'method before calling \'seq_train\' method.'
             )
-        self.__sess.run(self.__seq_train_p, feed_dict={self.__x: x})
-        self.__sess.run(self.__seq_train_beta, feed_dict={self.__x: x, self.__t: t})
+        self.__sess.run(self.__seq_train, feed_dict={self.__x: x, self.__t: t})
 
     def __build_init_train_graph(self):
         H = self.__activation(tf.matmul(self.__x, self.__alpha) + self.__bias)
         HT = tf.transpose(H)
         HTH = tf.matmul(HT, H)
-        init_train_p = self.__p.assign(tf.matrix_inverse(HTH))
-        pHT = tf.matmul(self.__p, HT)
+        p = tf.assign(self.__p, tf.matrix_inverse(HTH))
+        pHT = tf.matmul(p, HT)
         pHTt = tf.matmul(pHT, self.__t)
-        init_train_beta = self.__beta.assign(pHTt)
-        return (init_train_p, init_train_beta)
+        init_train = tf.assign(self.__beta, pHTt)
+        return init_train
 
     def __build_seq_train_graph(self):
         H = self.__activation(tf.matmul(self.__x, self.__alpha) + self.__bias)
@@ -138,11 +143,11 @@ class OS_ELM(object):
         HpHT = tf.matmul(Hp, HT)
         temp = tf.matrix_inverse(I + HpHT)
         pHT = tf.matmul(self.__p, HT)
-        seq_train_p = self.__p.assign(self.__p - tf.matmul(tf.matmul(pHT, temp), Hp))
-        pHT = tf.matmul(self.__p, HT)
+        p = tf.assign(self.__p, self.__p - tf.matmul(tf.matmul(pHT, temp), Hp))
+        pHT = tf.matmul(p, HT)
         Hbeta = tf.matmul(H, self.__beta)
-        seq_train_beta = self.__beta.assign(self.__beta + tf.matmul(pHT, self.__t - Hbeta))
-        return (seq_train_p, seq_train_beta)
+        seq_train = self.__beta.assign(self.__beta + tf.matmul(pHT, self.__t - Hbeta))
+        return seq_train
 
     def __del__(self):
         self.__sess.close()
