@@ -11,8 +11,8 @@ class OS_ELM(object):
         self.__n_hidden_nodes = n_hidden_nodes
         self.__n_output_nodes = n_output_nodes
         self.__activation = tf.nn.sigmoid
-        self.__x = tf.placeholder(tf.float32, [None, self.__n_input_nodes], name='input_x')
-        self.__t = tf.placeholder(tf.float32, [None, self.__n_output_nodes], name='input_t')
+        self.__x = tf.placeholder(tf.float32, shape=(None, self.__n_input_nodes), name='x')
+        self.__t = tf.placeholder(tf.float32, shape=(None, self.__n_output_nodes), name='t')
         self.__alpha = tf.constant(
             np.random.uniform(-1,1,size=(self.__n_input_nodes, self.__n_hidden_nodes)),
             dtype=tf.float32,
@@ -46,7 +46,9 @@ class OS_ELM(object):
         self.__seq_train_p, self.__seq_train_beta = self.__build_seq_train_graph()
 
         # Initialize variables
-        self.__sess.run(tf.initialize_variables([self.__p, self.__beta]))
+        variables = [self.__p, self.__beta]
+        for var in variables:
+            self.__sess.run(var.initializer)
 
     def predict(self, x):
         return self.__sess.run(self.__predict, feed_dict={self.__x: x})
@@ -95,10 +97,10 @@ class OS_ELM(object):
         H = self.__activation(tf.matmul(self.__x, self.__alpha) + self.__bias)
         HT = tf.transpose(H)
         HTH = tf.matmul(HT, H)
-        init_train_p = tf.assign(self.__p, tf.matrix_inverse(HTH))
+        init_train_p = self.__p.assign(tf.matrix_inverse(HTH))
         pHT = tf.matmul(self.__p, HT)
         pHTt = tf.matmul(pHT, self.__t)
-        init_train_beta = tf.assign(self.__beta, pHTt)
+        init_train_beta = self.__beta.assign(pHTt)
         return (init_train_p, init_train_beta)
 
     def __build_seq_train_graph(self):
@@ -111,10 +113,10 @@ class OS_ELM(object):
         HpHT = tf.matmul(Hp, HT)
         temp = tf.matrix_inverse(I + HpHT)
         pHT = tf.matmul(self.__p, HT)
-        seq_train_p = tf.assign(self.__p, self.__p - tf.matmul(tf.matmul(pHT, temp), Hp))
+        seq_train_p = self.__p.assign(self.__p - tf.matmul(tf.matmul(pHT, temp), Hp))
         pHT = tf.matmul(self.__p, HT)
         Hbeta = tf.matmul(H, self.__beta)
-        seq_train_beta = tf.assign(self.__beta, self.__beta + tf.matmul(pHT, self.__t - Hbeta))
+        seq_train_beta = self.__beta.assign(self.__beta + tf.matmul(pHT, self.__t - Hbeta))
         return (seq_train_p, seq_train_beta)
 
     def __del__(self):
