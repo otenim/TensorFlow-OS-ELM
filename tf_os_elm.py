@@ -4,13 +4,35 @@ import tensorflow as tf
 
 class OS_ELM(object):
 
-    def __init__(self, n_input_nodes, n_hidden_nodes, n_output_nodes):
+    def __init__(self, n_input_nodes, n_hidden_nodes, n_output_nodes, activation='sigmoid', loss='mean_squared_error'):
         self.__sess = tf.Session()
         self.__is_finished_init_train = False
         self.__n_input_nodes = n_input_nodes
         self.__n_hidden_nodes = n_hidden_nodes
         self.__n_output_nodes = n_output_nodes
-        self.__activation = tf.nn.sigmoid
+        if activation == 'sigmoid':
+            self.__activation = tf.nn.sigmoid
+        elif activation == 'linear':
+            self.__activation = tf.identity
+        else:
+            raise ValueError(
+                'an unknown activation function \'%s\' was given. '
+                'we currently support \'sigmoid\' and \'linear\'.' % (activation)
+            )
+        if loss == 'mean_squared_error':
+            self.__loss = tf.losses.mean_squared_error
+        elif loss == 'mean_absolute_error':
+            self.__loss = tf.keras.losses.mean_absolute_error
+        elif loss == 'binary_crossentropy':
+            self.__loss = tf.keras.losses.binary_crossentropy
+        elif loss == 'categorical_crossentropy':
+            self.__loss = tf.keras.losses.categorical_crossentropy
+        else:
+            raise ValueError(
+                'an unknown loss function \'%s\' was given. '
+                'we currently support \'mean_squared_error\', \'mean_absolute_error\', '
+                '\'binary_crossentropy\', \'categorical_crossentropy\'.' % loss
+            )
         self.__x = tf.placeholder(tf.float32, shape=(None, self.__n_input_nodes), name='x')
         self.__t = tf.placeholder(tf.float32, shape=(None, self.__n_output_nodes), name='t')
         self.__alpha = tf.constant(
