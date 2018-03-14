@@ -1,21 +1,24 @@
 import numpy as np
 import tqdm
 import tensorflow as tf
+import os
 
 class OS_ELM(object):
 
     def __init__(
         self, n_input_nodes, n_hidden_nodes, n_output_nodes,
         activation='sigmoid', loss='mean_squared_error', name=None):
+
         if name == None:
             self.name = 'model'
         else:
             self.name = name
+
         self.__sess = tf.Session()
-        self.__is_finished_init_train = False
         self.__n_input_nodes = n_input_nodes
         self.__n_hidden_nodes = n_hidden_nodes
         self.__n_output_nodes = n_output_nodes
+
         if activation == 'sigmoid':
             self.__activation = tf.nn.sigmoid
         elif activation == 'linear':
@@ -25,6 +28,7 @@ class OS_ELM(object):
                 'an unknown activation function \'%s\' was given. '
                 'we currently support \'sigmoid\' and \'linear\'.' % (activation)
             )
+
         if loss == 'mean_squared_error':
             self.__loss = tf.losses.mean_squared_error
         elif loss == 'mean_absolute_error':
@@ -39,33 +43,48 @@ class OS_ELM(object):
                 'we currently support \'mean_squared_error\', \'mean_absolute_error\', '
                 '\'binary_crossentropy\', \'categorical_crossentropy\'.' % loss
             )
+
+        self.__is_finished_init_train = tf.get_variable(
+            'is_finished_init_train',
+            shape=[],
+            dtype=bool,
+            initializer=tf.constant_initializer(False),
+        )
         self.__x = tf.placeholder(tf.float32, shape=(None, self.__n_input_nodes), name='x')
         self.__t = tf.placeholder(tf.float32, shape=(None, self.__n_output_nodes), name='t')
-        self.__alpha = tf.constant(
-            np.random.uniform(-1., 1., size=(self.__n_input_nodes, self.__n_hidden_nodes)),
-            dtype=tf.float32,
-            name='alpha',
-        )
-        self.__bias = tf.constant(
-            np.random.uniform(-1., 1., size=(self.__n_hidden_nodes)),
-            dtype=tf.float32,
-            name='bias',
-        )
-        self.__p = tf.Variable(
-            initial_value=np.zeros(shape=(self.__n_hidden_nodes, self.__n_hidden_nodes)),
+        self.__alpha = tf.get_variable(
+            'alpha',
+            shape=[self.__n_input_nodes, self.__n_hidden_nodes],
+            initializer=tf.random_uniform_initializer(-1,1),
             trainable=False,
-            dtype=tf.float32,
-            name='p',
         )
-        self.__beta = tf.Variable(
-            initial_value=np.zeros(shape=(self.__n_hidden_nodes, self.__n_output_nodes)),
+        self.__bias = tf.get_variable(
+            'bias',
+            shape=[self.__n_hidden_nodes],
+            initializer=tf.random_uniform_initializer(-1,1),
             trainable=False,
-            dtype=tf.float32,
-            name='beta',
         )
+        self.__beta = tf.get_variable(
+            'beta',
+            shape=[self.__n_hidden_nodes, self.__n_output_nodes],
+            initializer=tf.zeros_initializer(),
+            trainable=False,
+        )
+        self.__p = tf.get_variable(
+            'p',
+            shape=[self.__n_hidden_nodes, self.__n_hidden_nodes],
+            initializer=tf.zeros_initializer(),
+            trainable=False,
+        )
+
+        # Finish initial training phase
+        self.__finish_init_train = tf.assign(self.__is_finished_init_train, True)
 
         # Predict
         self.__predict = tf.matmul(self.__activation(tf.matmul(self.__x, self.__alpha) + self.__bias), self.__beta)
+
+        # Softmax Predict
+        self.__softmax_predict = tf.nn.softmax(self.__predict)
 
         # Loss
         self.__loss = self.__loss(self.__t, self.__predict)
@@ -79,11 +98,17 @@ class OS_ELM(object):
         # Sequential training phase
         self.__seq_train = self.__build_seq_train_graph()
 
+        # Saver
+        self.__saver = tf.train.Saver()
+
         # Initialize variables
         self.__sess.run(tf.global_variables_initializer())
 
-    def predict(self, x):
-        return self.__sess.run(self.__predict, feed_dict={self.__x: x})
+    def predict(self, x, softmax=False):
+        if softmax:
+            return self.__sess.run(self.__softmax_predict, feed_dict={self.__x: x})
+        else:
+            return self.__sess.run(self.__predict, feed_dict={self.__x: x})
 
     def evaluate(self, x, t, metrics=['loss']):
         ret = []
@@ -100,7 +125,7 @@ class OS_ELM(object):
 
 
     def init_train(self, x, t):
-        if self.__is_finished_init_train:
+        if self.__sess.run(self.__is_finished_init_train):
             raise Exception(
                 'the initial training phase has already finished. '
                 'please call \'seq_train\' method for further training.'
@@ -112,10 +137,10 @@ class OS_ELM(object):
                 'But this time len(x) = %d, while n_hidden_nodes = %d' % (len(x), self.__n_hidden_nodes)
             )
         self.__sess.run(self.__init_train, feed_dict={self.__x: x, self.__t: t})
-        self.__is_finished_init_train = True
+        self.__sess.run(self.__finish_init_train)
 
     def seq_train(self, x, t):
-        if self.__is_finished_init_train == False:
+        if self.__sess.run(self.__is_finished_init_train) == False:
             raise Exception(
                 'you have not gone through the initial training phase yet. '
                 'please first initialize the model\'s weights by \'init_train\' '
@@ -148,6 +173,16 @@ class OS_ELM(object):
         Hbeta = tf.matmul(H, self.__beta)
         seq_train = self.__beta.assign(self.__beta + tf.matmul(pHT, self.__t - Hbeta))
         return seq_train
+
+    def save(self, filepath):
+        self.__saver.save(self.__sess, filepath)
+
+    def restore(self, filepath):
+        self.__saver.restore(self.__sess, filepath)
+
+    def initialize_variables(self):
+        for var in [self.__alpha, self.__bias, self.__beta, self.__p, self.__is_finished_init_train]:
+            self.__sess.run(var.initializer)
 
     def __del__(self):
         self.__sess.close()
