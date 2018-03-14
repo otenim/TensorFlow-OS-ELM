@@ -1,182 +1,187 @@
-# OS-ELM-with-Python
+# TF-OS-ELM
 
 ## Overview
 
 <div align="center">
-    <img src="https://i.imgur.com/GckJu86.png" width=500>
+    <img src="https://i.imgur.com/GckJu86.png" width=600>
 </div>
 
-In this repository, we provide an implementation of Online Sequential
-Extreme Machine (OS-ELM) introduced by Liang et al. in 2006.
-OS-ELM is known to be able to trian faster and always converge to the global optimal solution.
-Also, since OS-ELM has smaller number of hyperparameters than backpropagation-based
-neural networks, it can provide a high generalization performance.
+In this repository, we provide a tensorflow implementation of Online Sequential
+Extreme Machine (OS-ELM) introduced by Liang et al. in this [paper](http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=4012031).
+You can execute our OS-ELM module either on CPU or multiple GPUs.
 
-[Paper](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.217.1418&rep=rep1&type=pdf).
+OS-ELM is known to be able to learn faster and the training will always
+converge to the global optimal solution, while ordinary backpropagation-based
+neural networks have to deal with the local minima problem.
 
-## Requsite Libraries
+## Dependencies
 
-We tested our codes using the following libraries.
+We tested our codes by using the following libraries.
 
 * Python==3.6.0
 * Numpy==1.14.1
-* Keras==2.1.4
+* Tensorflow==1.6.0
+* Keras==2.1.5
 * scikit-learn==0.17.1
 
-You don't have to use the exactly same version of the each library,
-but we can't guarantee codes work well in that case.
+We used Keras only for downloading the MNIST dataset.
 
-All requsite libraries above can be installed in the following command.
+You don't have to used exactly the same version of the each library,
+but we can not guarantee the codes work well in the case.
 
-`$ pip install -U numpy Keras scikit-learn`
+All libraries above can be installed in the following command.
+
+`$ pip install -U numpy Keras scikit-learn tensorflow`
+
+If you want to run our OS-ELM module on GPUs, please install `tensorflow-gpu`
+in addition to the above command.
 
 ## Usage
 
-Here, we describe how to train OS-ELM and predict with the trained model.  
-For the sake of simplicity, we assume to train a model on 'MNIST' dataset.  
-The following example shows a standard code pipeline for the use case.
+Here, we show how to train a OS-ELM module and predict on it.
+For the sake of simplicity, we assume to train the model on MNIST, a
+hand-written digits dataset.
 
 ```python
 from keras.datasets import mnist
 from keras.utils import to_categorical
-from os_elm import OS_ELM, load_model
+from os_elm import OS_ELM
 import numpy as np
-import argparse
+import tensorflow as tf
+import tqdm
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--n_hidden_nodes', type=int, default=256)
-parser.add_argument('--batch_size', type=int, default=32)
-parser.add_argument('--activation',
-    choices=['sigmoid','linear'], default='sigmoid')
-parser.add_argument('--loss',
-    choices=['mean_squared_error', 'mean_absolute_error'], default='mean_squared_error')
-
-def main(args):
-
-    # ===========================================
-    # Prepare dataset
-    # ===========================================
-    n_input_dimensions = 784
-    n_classes = 10
-
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    # normalize pixel values of input images within [0,1]
-    x_train = x_train.astype(np.float32) / 255.
-    x_test = x_test.astype(np.float32) / 255.
-    # reshape
-    x_train = x_train.reshape(-1,n_input_dimensions)
-    x_test = x_test.reshape(-1,n_input_dimensions)
-    # transform label data in one-hot-vector format
-    y_train = to_categorical(y_train, num_classes=n_classes)
-    y_test = to_categorical(y_test, num_classes=n_classes)
+def main():
 
     # ===========================================
     # Instantiate os-elm
     # ===========================================
+    n_input_nodes = 784
+    n_hidden_nodes = 1024
+    n_output_nodes = 10
 
     os_elm = OS_ELM(
-        # number of nodes of input layer
-        n_input_nodes=n_input_dimensions,
-        # number of nodes of hidden layer
-        n_hidden_nodes=args.n_hidden_nodes,
-        # number of nodes of output layer
-        n_output_nodes=n_classes, # 10
-        # activation function
-        # support 'sigmoid' and 'linear' so far.
-        # the default value is 'sigmoid'.
-        activation=args.activation,
-        # loss function
-        # support 'mean_squared_error' and 'mean_absolute_error' so far.
+        # the number of input nodes.
+        n_input_nodes=n_input_nodes,
+        # the number of hidden nodes.
+        n_hidden_nodes=n_hidden_nodes,
+        # the number of output nodes.
+        n_output_nodes=n_output_nodes,
+        # loss function.
         # the default value is 'mean_squared_error'.
-        loss=args.loss
+        # for the other functions, we support
+        # 'mean_absolute_error', 'categorical_crossentropy',
+        # and 'binary_crossentropy'.
+        loss='mean_squared_error',
+        # activation function
+        # the default value is 'sigmoid'.
+        # for the other functions, we support 'linear'.
+        activation='sigmoid',
     )
 
+    # ===========================================
+    # Prepare dataset
+    # ===========================================
+    n_classes = n_output_nodes
 
-    # ===========================================
-    # training
-    # ===========================================
-    # devide x_train into two dataset.
-    # the one is for initial training phase,
-    # the other is for sequential training phase.
-    # NOTE: number of data samples for initial training phase
-    # should be much greater than os_elm.n_hidden_nodes.
-    # here, we set 1.1 * os_elm.n_hidden_nodes as the
-    # number of data samples for initial training phase.
-    border = int(1.1 * os_elm.n_hidden_nodes)
+    # load MNIST
+    (x_train, t_train), (x_test, t_test) = mnist.load_data()
+    # normalize images' values within [0, 1]
+    x_train = x_train.reshape(-1, n_input_nodes) / 255.
+    x_test = x_test.reshape(-1, n_input_nodes) / 255.
+    x_train = x_train.astype(np.float32)
+    x_test = x_test.astype(np.float32)
+
+    # convert label data into one-hot-vector format data.
+    t_train = to_categorical(t_train, num_classes=n_classes)
+    t_test = to_categorical(t_test, num_classes=n_classes)
+    t_train = t_train.astype(np.float32)
+    t_test = t_test.astype(np.float32)
+
+    # divide the training dataset into two datasets:
+    # (1) for the initial training phase
+    # (2) for the sequential training phase
+    # NOTE: the number of training samples for the initial training phase
+    # must be much greater than the number of the model's hidden nodes.
+    # here, we assign int(1.5 * n_hidden_nodes) training samples
+    # for the initial training phase.
+    border = int(1.5 * n_hidden_nodes)
     x_train_init = x_train[:border]
-    y_train_init = y_train[:border]
     x_train_seq = x_train[border:]
-    y_train_seq = y_train[border:]
+    t_train_init = t_train[:border]
+    t_train_seq = t_train[border:]
 
-    # initial training phase
-    os_elm.init_train(
-        x_train_init,
-        y_train_init
-    )
 
-    # sequential training phase
-    os_elm.seq_train(
-        x_train_seq,
-        y_train_seq,
-        # batch size during sequential training phase
-        # the default value is 32.
-        batch_size=args.batch_size,
-        # whether to show a progress bar or not
-        # the default value is 1.
-        verbose=1,
-    )
+    # ===========================================
+    # Training
+    # ===========================================
+    # the initial training phase
+    pbar = tqdm.tqdm(total=len(x_train), desc='initial training phase')
+    os_elm.init_train(x_train_init, t_train_init)
+    pbar.update(n=len(x_train_init))
+
+    # the sequential training phase
+    pbar.set_description('sequential training phase')
+    batch_size = 64
+    for i in range(0, len(x_train_seq), batch_size):
+        x_batch = x_train_seq[i:i+batch_size]
+        t_batch = t_train_seq[i:i+batch_size]
+        os_elm.seq_train(x_batch, t_batch)
+        pbar.update(n=len(x_batch))
+    pbar.close()
 
     # ===========================================
     # Prediction
     # ===========================================
-    # NOTE: input numpy arrays' shape is always assumed to
-    # be in the following 2D format: (batch_size, n_input_nodes).
-    # Even when you feed one training sample to the model,
-    # the input sample's shape must be (1, n_input_nodes), not
-    # (n_input_nodes,). Here, we feed one validation sample
-    # as an example.
-    n = 5
+    # sample 10 validation samples from x_test
+    n = 10
     x = x_test[:n]
-    y_pred = os_elm.predict(x, softmax=True)
-
+    t = t_test[:n]
+    # If 'softmax' is True, softmax function is applied to the raw outputs,
+    # otherwise the raw outputs are returned as they are.
+    y = os_elm.predict(x, softmax=True)
+    # check the answers.
     for i in range(n):
-        print("========== Prediction result (%d) ==========" % i)
-        class_id = np.argmax(y_pred[i])
-        print("class_id (prediction): %d" % class_id)
-        print("class_id (true): %d" % np.argmax(y_test[i]))
-        class_prob = y_pred[i][class_id]
-        print("probability (prediction): %.3f" % class_prob)
+        print('========== sample index %d ==========' % i)
+        print('estimated answer: class %d' % np.argmax(y[i]))
+        print('estimated probability: %.3f' % np.max(y[i]))
+        print('true answer: class %d' % np.argmax(t[i]))
 
     # ===========================================
     # Evaluation
     # ===========================================
-    print("========== Evaluation result ==========")
-    loss, acc = os_elm.evaluate(
-        x_test,
-        y_test,
-        # 'loss' and 'accuracy' are supported so far.
-        # the default value is ['loss']
-        # NOTE: 'accuracy' is only available for classification problems.
-        metrics=['loss', 'accuracy']
-    )
-    print('validation loss: %f' % loss)
-    print('classification accuracy: %f' % acc)
+    # we currently support 'loss' and 'accuracy' for 'metrics'.
+    # NOTE: 'accuracy' is valid only if the model assumes
+    # to deal with a classification problem, while 'loss' is always valid.
+    [loss, accuracy] = os_elm.evaluate(x_test, t_test, metrics=['loss', 'accuracy'])
+    print('val_loss: %f, val_accuracy: %f' % (loss, accuracy))
 
     # ===========================================
     # Save model
     # ===========================================
-    print("saving trained model as model.pkl...")
-    os_elm.save('model.pkl')
+    print('saving model parameters...')
+    os_elm.save('./checkpoint/model.ckpt')
+
+    # initialize weights of os_elm
+    os_elm.initialize_variables()
 
     # ===========================================
     # Load model
     # ===========================================
-    print('loading model froom model.pkl...')
-    os_elm = load_model('model.pkl')
+    # If you want to load weights to a model,
+    # the architecture of the model must be exactly the same
+    # as the one when the weights were saved.
+    print('restoring model parameters...')
+    os_elm.restore('./checkpoint/model.ckpt')
+
+    # ===========================================
+    # ReEvaluation
+    # ===========================================
+    [loss, accuracy] = os_elm.evaluate(x_test, t_test, metrics=['loss', 'accuracy'])
+    print('val_loss: %f, val_accuracy: %f' % (loss, accuracy))
 
 if __name__ == '__main__':
-    args = parser.parse_args()
-    main(args)
+    main()
+
 ```
 
 ## Notes
@@ -184,42 +189,30 @@ if __name__ == '__main__':
 The following figure shows OS-ELM training formula.  
 
 <div align="center">
-    <img src="https://i.imgur.com/QjqaMcS.png" width=500>
+    <img src="https://i.imgur.com/QjqaMcS.png" width=600>
 </div>
 
-* OS-ELM always converge to the global optimal solutions, while backpropagation-based neural networks
-tend to suffer from local minima problem.
-* OS-ELM does not need to train iteratively on the same data samples.
-Even if you did it, the computational result will not change at all.
-* OS-ELM does not need to compute gradients. The weights are trained by
+* Every training on OS-ELM will always converge to the global optimal solution.
+* If you feed all the training samples to OS-ELM in the initial training phase,
+the computational procedures will be exactly the same as ELM.
+So, we can consider ELM is a special case of OS-ELM.
+* OS-ELM does not need to train iteratively on the same data samples,
+while backpropagation-based models usually need to do that.
+* OS-ELM does not update 'alpha', the weight matrix connecting the input nodes
+and the hidden nodes. It makes OS-ELM train faster.
+* OS-ELM does not need to compute gradients. The weight matrices are trained by
 computing some matrix multipies and a matrix inversion.
-* The computational complexity for the matrix inversion is O(batch_size^3),
-so take care for the cost when you increase batch_size.
+* The computational complexity for the matrix inversion is about O(batch\_size^3),
+so take care for the cost when you increase batch\_size.
 
 ## Demo
 
-The above code is summarized in train_mnist.py. Here, we describe how to
-execute the script.
+You can execute the above sample code with the following command.
 
-`$ python train_mnist.py [--n_hidden_nodes] [--batch_size] [--activation] [--loss]`
-
-* [optional] `--n_hidden_nodes`: number of nodes of hidden layer.
-the default value is set to 512.
-* [optional] `--batch_size`: batch size during sequential training phase.
-the default value is set to 32.
-* [optional] `--activation`: activation function to be applied in hidden nodes.
-we support 'sigmoid' and 'linear' so far. the default value is set to 'sigmoid'.
-* [optional] `--loss`: loss function to be applied in model's output.
-we support 'mean_squared_error' and 'mean_absolute_error' so far.
-the default value is set to 'mean_squared_error'.
-
-The following command is an example.
-
-`$ python train.py --n_hidden_nodes 512 --batch_size 32 --activation sigmoid --loss mean_squared_error`
+`$ python train_mnist.py`
 
 ## Todos
 
 * support more activation functions
 * support more loss functions
-* provide GPU implementation using CuPy
 * provide benchmark results
