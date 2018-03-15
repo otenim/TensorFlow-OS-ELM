@@ -5,6 +5,13 @@ import numpy as np
 import tensorflow as tf
 import tqdm
 
+def softmax(a):
+    c = np.max(a)
+    exp_a = np.exp(a - c)
+    sum_exp_a = np.sum(exp_a)
+    y = exp_a / sum_exp_a
+    return y
+
 def main():
 
     # ===========================================
@@ -27,9 +34,10 @@ def main():
         # 'mean_absolute_error', 'categorical_crossentropy',
         # and 'binary_crossentropy'.
         loss='mean_squared_error',
-        # activation function
+        # activation function applied to the hidden nodes.
         # the default value is 'sigmoid'.
         # for the other functions, we support 'linear'.
+        # NOTE: OS-ELM can apply an activation function to only the hidden nodes.
         activation='sigmoid',
     )
 
@@ -91,9 +99,11 @@ def main():
     n = 10
     x = x_test[:n]
     t = t_test[:n]
-    # If 'softmax' is True, softmax function is applied to the raw outputs,
-    # otherwise the raw outputs are returned as they are.
-    y = os_elm.predict(x, softmax=True)
+
+    # 'predict' method returns raw values of output nodes.
+    y = os_elm.predict(x)
+    # apply softmax function to the output values.
+    y = softmax(y)
     # check the answers.
     for i in range(n):
         print('========== sample index %d ==========' % i)

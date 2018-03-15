@@ -50,6 +50,13 @@ import numpy as np
 import tensorflow as tf
 import tqdm
 
+def softmax(a):
+    c = np.max(a)
+    exp_a = np.exp(a - c)
+    sum_exp_a = np.sum(exp_a)
+    y = exp_a / sum_exp_a
+    return y
+
 def main():
 
     # ===========================================
@@ -72,9 +79,10 @@ def main():
         # 'mean_absolute_error', 'categorical_crossentropy',
         # and 'binary_crossentropy'.
         loss='mean_squared_error',
-        # activation function
+        # activation function applied to the hidden nodes.
         # the default value is 'sigmoid'.
         # for the other functions, we support 'linear'.
+        # NOTE: OS-ELM can apply an activation function to only the hidden nodes.
         activation='sigmoid',
     )
 
@@ -136,9 +144,11 @@ def main():
     n = 10
     x = x_test[:n]
     t = t_test[:n]
-    # If 'softmax' is True, softmax function is applied to the raw outputs,
-    # otherwise the raw outputs are returned as they are.
-    y = os_elm.predict(x, softmax=True)
+
+    # 'predict' method returns raw values of output nodes.
+    y = os_elm.predict(x)
+    # apply softmax function to the output values.
+    y = softmax(y)
     # check the answers.
     for i in range(n):
         print('========== sample index %d ==========' % i)
@@ -181,7 +191,6 @@ def main():
 
 if __name__ == '__main__':
     main()
-
 ```
 
 ## Notes
@@ -192,6 +201,7 @@ The following figure shows OS-ELM training formula.
     <img src="https://i.imgur.com/QjqaMcS.png" width=600>
 </div>
 
+* In OS-ELM, you can apply an activation function to only the hidden nodes.
 * Every training on OS-ELM will always converge to the global optimal solution.
 * If you feed all the training samples to OS-ELM in the initial training phase,
 the computational procedures will be exactly the same as ELM.
