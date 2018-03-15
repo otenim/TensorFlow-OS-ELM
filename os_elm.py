@@ -50,13 +50,13 @@ class OS_ELM(object):
         self.__alpha = tf.get_variable(
             'alpha',
             shape=[self.__n_input_nodes, self.__n_hidden_nodes],
-            initializer=tf.random_uniform_initializer(-1,1),
+            initializer=tf.random_uniform_initializer(0,1),
             trainable=False,
         )
         self.__bias = tf.get_variable(
             'bias',
             shape=[self.__n_hidden_nodes],
-            initializer=tf.random_uniform_initializer(-1,1),
+            initializer=tf.zeros_initializer(),
             trainable=False,
         )
         self.__beta = tf.get_variable(
