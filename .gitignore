@@ -4,5 +4,4 @@ weights/*
 datasets/*
 results/*
 models/*
-checkpoint/
 *.pkl
