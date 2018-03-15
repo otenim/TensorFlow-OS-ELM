@@ -29,10 +29,9 @@ def main():
         # the number of output nodes.
         n_output_nodes=n_output_nodes,
         # loss function.
-        # the default value is 'mean_squared_error'.
+        # the default value is 'softmax_cross_entropy'.
         # for the other functions, we support
-        # 'mean_absolute_error', 'categorical_crossentropy',
-        # and 'binary_crossentropy'.
+        # 'mean_absolute_error' and 'mean_squared_error'.
         loss='softmax_cross_entropy',
         # activation function applied to the hidden nodes.
         # the default value is 'sigmoid'.
