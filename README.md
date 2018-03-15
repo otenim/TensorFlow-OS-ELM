@@ -78,7 +78,7 @@ def main():
         # for the other functions, we support
         # 'mean_absolute_error', 'categorical_crossentropy',
         # and 'binary_crossentropy'.
-        loss='mean_squared_error',
+        loss='softmax_cross_entropy',
         # activation function applied to the hidden nodes.
         # the default value is 'sigmoid'.
         # for the other functions, we support 'linear'.
