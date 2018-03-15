@@ -30,13 +30,13 @@ class OS_ELM(object):
             )
 
         if loss == 'mean_squared_error':
-            self.__loss = tf.losses.mean_squared_error
+            self.__lossfun = tf.losses.mean_squared_error
         elif loss == 'mean_absolute_error':
-            self.__loss = tf.keras.losses.mean_absolute_error
+            self.__lossfun = tf.keras.losses.mean_absolute_error
         elif loss == 'binary_crossentropy':
-            self.__loss = tf.keras.losses.binary_crossentropy
+            self.__lossfun = tf.keras.losses.binary_crossentropy
         elif loss == 'categorical_crossentropy':
-            self.__loss = tf.keras.losses.categorical_crossentropy
+            self.__lossfun = tf.keras.losses.categorical_crossentropy
         else:
             raise ValueError(
                 'an unknown loss function \'%s\' was given. '
@@ -87,7 +87,7 @@ class OS_ELM(object):
         self.__softmax_predict = tf.nn.softmax(self.__predict)
 
         # Loss
-        self.__loss = self.__loss(self.__t, self.__predict)
+        self.__loss = self.__lossfun(self.__t, self.__predict)
 
         # Accuracy
         self.__accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(self.__predict, 1), tf.argmax(self.__t, 1)), tf.float32))
