@@ -62,19 +62,19 @@ class NN(object):
 
         # Initialize variables
         self.__sess.run(tf.global_variables_initializer())
-    
-    def train_on_batch(x, t):
+
+    def train_on_batch(self, x, t):
         self.__sess.run(self.__fit_step, feed_dict={
             self.__x: x,
             self.__t: t,
         })
 
-    def predict_on_batch(x, t):
+    def predict_on_batch(self, x, t):
         self.__sess.run(self.__predict, feed_dict={
             self.__x: x,
         })
 
-    def test_on_batch(x, t, metrics=['loss']):
+    def test_on_batch(self, x, t, metrics=['loss']):
         met = []
         for m in metrics:
             if m == 'loss':
