@@ -7,7 +7,7 @@ class OS_ELM(object):
 
     def __init__(
         self, n_input_nodes, n_hidden_nodes, n_output_nodes,
-        activation='sigmoid', loss='mean_squared_error', name=None):
+        activation='sigmoid', loss='softmax_cross_entropy', name=None):
 
         if name == None:
             self.name = 'model'
@@ -21,27 +21,22 @@ class OS_ELM(object):
 
         if activation == 'sigmoid':
             self.__activation = tf.nn.sigmoid
-        elif activation == 'linear':
+        elif activation == 'linear' or activation == None:
             self.__activation = tf.identity
         else:
             raise ValueError(
-                'an unknown activation function \'%s\' was given. '
-                'we currently support \'sigmoid\' and \'linear\'.' % (activation)
+                'an unknown activation function \'%s\' was given.' % (activation)
             )
 
         if loss == 'mean_squared_error':
-            self.__loss = tf.losses.mean_squared_error
+            self.__lossfun = tf.losses.mean_squared_error
         elif loss == 'mean_absolute_error':
-            self.__loss = tf.keras.losses.mean_absolute_error
-        elif loss == 'binary_crossentropy':
-            self.__loss = tf.keras.losses.binary_crossentropy
-        elif loss == 'categorical_crossentropy':
-            self.__loss = tf.keras.losses.categorical_crossentropy
+            self.__lossfun = tf.keras.losses.mean_absolute_error
+        elif loss == 'softmax_cross_entropy':
+            self.__lossfun = tf.losses.softmax_cross_entropy
         else:
             raise ValueError(
-                'an unknown loss function \'%s\' was given. '
-                'we currently support \'mean_squared_error\', \'mean_absolute_error\', '
-                '\'binary_crossentropy\', \'categorical_crossentropy\'.' % loss
+                'an unknown loss function \'%s\' was given. ' % loss
             )
 
         self.__is_finished_init_train = tf.get_variable(
@@ -83,11 +78,8 @@ class OS_ELM(object):
         # Predict
         self.__predict = tf.matmul(self.__activation(tf.matmul(self.__x, self.__alpha) + self.__bias), self.__beta)
 
-        # Softmax Predict
-        self.__softmax_predict = tf.nn.softmax(self.__predict)
-
         # Loss
-        self.__loss = self.__loss(self.__t, self.__predict)
+        self.__loss = self.__lossfun(self.__t, self.__predict)
 
         # Accuracy
         self.__accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(self.__predict, 1), tf.argmax(self.__t, 1)), tf.float32))
@@ -104,25 +96,22 @@ class OS_ELM(object):
         # Initialize variables
         self.__sess.run(tf.global_variables_initializer())
 
-    def predict(self, x, softmax=False):
-        if softmax:
-            return self.__sess.run(self.__softmax_predict, feed_dict={self.__x: x})
-        else:
-            return self.__sess.run(self.__predict, feed_dict={self.__x: x})
+    def predict(self, x):
+        return self.__sess.run(self.__predict, feed_dict={self.__x: x})
 
     def evaluate(self, x, t, metrics=['loss']):
-        ret = []
-        for metric in metrics:
-            if metric == 'loss':
-                loss =  self.__sess.run(self.__loss, feed_dict={self.__x: x, self.__t: t})
-                ret.append(loss)
-            elif metric == 'accuracy':
-                accuracy = self.__sess.run(self.__accuracy, feed_dict={self.__x: x, self.__t: t})
-                ret.append(accuracy)
+        met = []
+        for m in metrics:
+            if m == 'loss':
+                met.append(self.__loss)
+            elif m == 'accuracy':
+                met.append(self.__accuracy)
             else:
-                continue
+                return ValueError(
+                    'an unknown metric \'%s\' was given.' % m
+                )
+        ret = self.__sess.run(met, feed_dict={self.__x: x, self.__t: t})
         return ret
-
 
     def init_train(self, x, t):
         if self.__sess.run(self.__is_finished_init_train):
