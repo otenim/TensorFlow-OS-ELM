@@ -31,7 +31,7 @@ def main(args):
         for i in range(args.n):
             x = np.random.uniform(size=(batch_size, args.n_input_nodes))
             stime = time.time()
-            model.test_on_batch(x, x)
+            model.train_on_batch(x, x)
             etime = time.time()
             times.append(etime - stime)
             pbar.update(1)
