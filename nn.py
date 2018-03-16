@@ -112,7 +112,7 @@ class NN(object):
     def restore(self, filepath):
         self.__saver.restore(self.__sess, filepath)
 
-    def initialize_variables(self):
+    def reset_variables(self):
         for var in [self.__alpha, self.__bias, self.__beta, self.__p, self.__is_finished_init_train]:
             self.__sess.run(var.initializer)
 
