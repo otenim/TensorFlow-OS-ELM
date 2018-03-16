@@ -23,14 +23,15 @@ def main(args):
         activation=args.activation,
     )
 
-    # initial training phase
-    x = np.random.uniform(size=(args.n_hidden_nodes*2, args.n_input_nodes))
-    os_elm.init_train(x, x)
-
     # sequential training phase
     for batch_size in [4, 8, 16, 32, 64, 128, 256]:
+        # initial training phase
+        x = np.random.uniform(size=(2 * args.n_hidden_nodes, args.n_input_nodes))
+        os_elm.init_train(x, x)
+
         pbar = tqdm.tqdm(total=args.n, desc='Batchsize %d' % batch_size)
         times = []
+        # sequential training phase
         for i in range(args.n):
             x = np.random.uniform(size=(batch_size, args.n_input_nodes))
             stime = time.time()
@@ -39,6 +40,7 @@ def main(args):
             times.append(etime - stime)
             pbar.update(1)
         pbar.close()
+        os_elm.reset_variables()
         times = np.array(times)
         mean = np.mean(times)
         print('mean training time: %f [msec/batch]' % (1000*mean))

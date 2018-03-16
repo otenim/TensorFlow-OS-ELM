@@ -113,7 +113,7 @@ class NN(object):
         self.__saver.restore(self.__sess, filepath)
 
     def reset_variables(self):
-        for var in [self.__alpha, self.__bias, self.__beta, self.__p, self.__is_finished_init_train]:
+        for var in [self.__w1, self.__w2, self.__b]:
             self.__sess.run(var.initializer)
 
     def __get_optimizer(self, name):
