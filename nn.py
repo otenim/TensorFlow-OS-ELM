@@ -36,16 +36,22 @@ class NN(object):
             dtype=tf.float32,
             initializer=tf.contrib.layers.xavier_initializer()
         )
-        self.__b = tf.get_variable(
-            'b',
+        self.__b1 = tf.get_variable(
+            'b1',
             shape=[self.__n_hidden_nodes],
             dtype=tf.float32,
-            initializer=tf.contrib.layers.xavier_initializer()
+            initializer=tf.contrib.layers.xavier_initializer(),
+        )
+        self.__b2 = tf.get_variable(
+            'b2',
+            shape=[self.__n_output_nodes],
+            dtype=tf.float32,
+            initializer=tf.contrib.layers.xavier_initializer(),
         )
 
         # Predict
-        h1 = self.__hidden_actfun(tf.matmul(self.__x, self.__w1) + self.__b)
-        h2 = self.__output_actfun(tf.matmul(h1, self.__w2))
+        h1 = self.__hidden_actfun(tf.matmul(self.__x, self.__w1) + self.__b1)
+        h2 = self.__output_actfun(tf.matmul(h1, self.__w2) + self.__b2)
         self.__predict = h2
 
         # Loss
@@ -113,7 +119,7 @@ class NN(object):
         self.__saver.restore(self.__sess, filepath)
 
     def reset_variables(self):
-        for var in [self.__w1, self.__w2, self.__b]:
+        for var in [self.__w1, self.__w2, self.__b1, self.__b2]:
             self.__sess.run(var.initializer)
 
     def __get_optimizer(self, name):
