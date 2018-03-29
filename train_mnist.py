@@ -6,11 +6,10 @@ import tensorflow as tf
 import tqdm
 
 def softmax(a):
-    c = np.max(a)
+    c = np.max(a, axis=-1)
     exp_a = np.exp(a - c)
-    sum_exp_a = np.sum(exp_a)
-    y = exp_a / sum_exp_a
-    return y
+    sum_exp_a = np.sum(exp_a, axis=-1)
+    return exp_a / sum_exp_a
 
 def main():
 
@@ -29,14 +28,14 @@ def main():
         # the number of output nodes.
         n_output_nodes=n_output_nodes,
         # loss function.
-        # the default value is 'softmax_cross_entropy'.
+        # the default value is 'mean_squared_error'.
         # for the other functions, we support
-        # 'mean_absolute_error' and 'mean_squared_error'.
-        loss='softmax_cross_entropy',
+        # 'mean_absolute_error', 'categorical_crossentropy', and 'binary_crossentropy'.
+        loss='mean_squared_error',
         # activation function applied to the hidden nodes.
         # the default value is 'sigmoid'.
-        # for the other functions, we support 'linear'.
-        # NOTE: OS-ELM can apply an activation function to only the hidden nodes.
+        # for the other functions, we support 'linear' and 'tanh'.
+        # NOTE: OS-ELM can apply an activation function only to the hidden nodes.
         activation='sigmoid',
     )
 
@@ -103,11 +102,13 @@ def main():
     y = os_elm.predict(x)
     # apply softmax function to the output values.
     y = softmax(y)
+    print(y)
     # check the answers.
     for i in range(n):
+        max_ind = np.argmax(y[i])
         print('========== sample index %d ==========' % i)
-        print('estimated answer: class %d' % np.argmax(y[i]))
-        print('estimated probability: %.3f' % np.max(y[i]))
+        print('estimated answer: class %d' % max_ind)
+        print('estimated probability: %.3f' % y[i,max_ind])
         print('true answer: class %d' % np.argmax(t[i]))
 
     # ===========================================

@@ -7,7 +7,7 @@ class OS_ELM(object):
 
     def __init__(
         self, n_input_nodes, n_hidden_nodes, n_output_nodes,
-        activation='sigmoid', loss='softmax_cross_entropy', name=None):
+        activation='sigmoid', loss='mean_squared_error', name=None):
 
         if name == None:
             self.name = 'model'
@@ -23,6 +23,8 @@ class OS_ELM(object):
             self.__activation = tf.nn.sigmoid
         elif activation == 'linear' or activation == None:
             self.__activation = tf.identity
+        elif activation == 'tanh':
+            self.__activation = tf.tanh
         else:
             raise ValueError(
                 'an unknown activation function \'%s\' was given.' % (activation)
@@ -32,8 +34,10 @@ class OS_ELM(object):
             self.__lossfun = tf.losses.mean_squared_error
         elif loss == 'mean_absolute_error':
             self.__lossfun = tf.keras.losses.mean_absolute_error
-        elif loss == 'softmax_cross_entropy':
-            self.__lossfun = tf.losses.softmax_cross_entropy
+        elif loss == 'categorical_crossentropy':
+            self.__lossfun = tf.keras.losses.categorical_crossentropy
+        elif loss == 'binary_crossentropy':
+            self.__lossfun = tf.keras.losses.binary_crossentropy
         else:
             raise ValueError(
                 'an unknown loss function \'%s\' was given. ' % loss
@@ -175,6 +179,14 @@ class OS_ELM(object):
 
     def __del__(self):
         self.__sess.close()
+
+    @property
+    def input_shape(self):
+        return (self.__n_input_nodes,)
+
+    @property
+    def output_shape(self):
+        return (self.__n_output_nodes,)
 
     @property
     def n_input_nodes(self):

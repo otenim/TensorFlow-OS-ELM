@@ -51,11 +51,10 @@ import tensorflow as tf
 import tqdm
 
 def softmax(a):
-    c = np.max(a)
+    c = np.max(a, axis=-1)
     exp_a = np.exp(a - c)
-    sum_exp_a = np.sum(exp_a)
-    y = exp_a / sum_exp_a
-    return y
+    sum_exp_a = np.sum(exp_a, axis=-1)
+    return exp_a / sum_exp_a
 
 def main():
 
@@ -76,13 +75,12 @@ def main():
         # loss function.
         # the default value is 'mean_squared_error'.
         # for the other functions, we support
-        # 'mean_absolute_error', 'categorical_crossentropy',
-        # and 'binary_crossentropy'.
-        loss='softmax_cross_entropy',
+        # 'mean_absolute_error', 'categorical_crossentropy', and 'binary_crossentropy'.
+        loss='mean_squared_error',
         # activation function applied to the hidden nodes.
         # the default value is 'sigmoid'.
-        # for the other functions, we support 'linear'.
-        # NOTE: OS-ELM can apply an activation function to only the hidden nodes.
+        # for the other functions, we support 'linear' and 'tanh'.
+        # NOTE: OS-ELM can apply an activation function only to the hidden nodes.
         activation='sigmoid',
     )
 
@@ -149,11 +147,13 @@ def main():
     y = os_elm.predict(x)
     # apply softmax function to the output values.
     y = softmax(y)
+    print(y)
     # check the answers.
     for i in range(n):
+        max_ind = np.argmax(y[i])
         print('========== sample index %d ==========' % i)
-        print('estimated answer: class %d' % np.argmax(y[i]))
-        print('estimated probability: %.3f' % np.max(y[i]))
+        print('estimated answer: class %d' % max_ind)
+        print('estimated probability: %.3f' % y[i,max_ind])
         print('true answer: class %d' % np.argmax(t[i]))
 
     # ===========================================
@@ -201,20 +201,20 @@ The following figure shows OS-ELM training formula.
     <img src="https://i.imgur.com/QjqaMcS.png" width=600>
 </div>
 
+
+* **important**: Since matrix inversion in OS-ELM update formula has a lot of conditional operations, even if it is executed on GPUs, the training is not necessarily accelerated.
 * In OS-ELM, you can apply an activation function to only the hidden nodes.
-* Every training on OS-ELM will always converge to the global optimal solution.
+* OS-ELM always finds the global optimal solution for the weight matrices at every training.
 * If you feed all the training samples to OS-ELM in the initial training phase,
-the computational procedures will be exactly the same as ELM.
-So, we can consider ELM is a special case of OS-ELM.
+the computational procedures will be exactly the same as ELM. So, we can consider ELM is a special case of OS-ELM.
 * OS-ELM does not need to train iteratively on the same data samples,
 while backpropagation-based models usually need to do that.
 * OS-ELM does not update 'alpha', the weight matrix connecting the input nodes
 and the hidden nodes. It makes OS-ELM train faster.
 * OS-ELM does not need to compute gradients. The weight matrices are trained by
-computing some matrix multipies and a matrix inversion.
+computing some matrix products and a matrix inversion.
 * The computational complexity for the matrix inversion is about O(batch\_size^3),
 so take care for the cost when you increase batch\_size.
-
 ## Demo
 
 You can execute the above sample code with the following command.
