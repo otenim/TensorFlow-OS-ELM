@@ -26,10 +26,10 @@ We tested our codes by using the following libraries.
 
 We used Keras only for downloading the MNIST dataset.
 
-You don't have to used exactly the same version of the each library,
+You don't have to use exactly the same version of the each library,
 but we can not guarantee the codes work well in the case.
 
-All libraries above can be installed in the following command.
+All the above libraries can be installed in the following command.
 
 `$ pip install -U numpy Keras scikit-learn tensorflow`
 
