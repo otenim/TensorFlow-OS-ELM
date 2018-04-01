@@ -203,7 +203,7 @@ The following figure shows OS-ELM training formula.
 
 
 * **important**: Since matrix inversion in OS-ELM update formula has a lot of conditional operations, even if it is executed on GPUs, the training is not necessarily accelerated.
-* In OS-ELM, you can apply an activation function to only the hidden nodes.
+* In OS-ELM, you can apply an activation function only to the hidden nodes.
 * OS-ELM always finds the global optimal solution for the weight matrices at every training.
 * If you feed all the training samples to OS-ELM in the initial training phase,
 the computational procedures will be exactly the same as ELM. So, we can consider ELM is a special case of OS-ELM.
