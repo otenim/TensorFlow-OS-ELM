@@ -7,7 +7,7 @@
 </div>
 
 In this repository, we provide a tensorflow implementation of Online Sequential
-Extreme Machine (OS-ELM) introduced by Liang et al. in this [paper](http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=4012031).
+Extreme Learning Machine (OS-ELM) introduced by Liang et al. in this [paper](http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=4012031).
 You can execute our OS-ELM module either on CPU or multiple GPUs.
 
 OS-ELM is known to be able to learn faster and the training will always
@@ -162,6 +162,7 @@ def main():
     # we currently support 'loss' and 'accuracy' for 'metrics'.
     # NOTE: 'accuracy' is valid only if the model assumes
     # to deal with a classification problem, while 'loss' is always valid.
+    # loss = os_elm.evaluate(x_test, t_test, metrics=['loss']
     [loss, accuracy] = os_elm.evaluate(x_test, t_test, metrics=['loss', 'accuracy'])
     print('val_loss: %f, val_accuracy: %f' % (loss, accuracy))
 
@@ -186,6 +187,7 @@ def main():
     # ===========================================
     # ReEvaluation
     # ===========================================
+    # loss = os_elm.evaluate(x_test, t_test, metrics=['loss']
     [loss, accuracy] = os_elm.evaluate(x_test, t_test, metrics=['loss', 'accuracy'])
     print('val_loss: %f, val_accuracy: %f' % (loss, accuracy))
 
@@ -215,6 +217,7 @@ and the hidden nodes. It makes OS-ELM train faster.
 computing some matrix products and a matrix inversion.
 * The computational complexity for the matrix inversion is about O(batch\_size^3),
 so take care for the cost when you increase batch\_size.
+
 ## Demo
 
 You can execute the above sample code with the following command.

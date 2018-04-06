@@ -117,6 +117,7 @@ def main():
     # we currently support 'loss' and 'accuracy' for 'metrics'.
     # NOTE: 'accuracy' is valid only if the model assumes
     # to deal with a classification problem, while 'loss' is always valid.
+    # loss = os_elm.evaluate(x_test, t_test, metrics=['loss']
     [loss, accuracy] = os_elm.evaluate(x_test, t_test, metrics=['loss', 'accuracy'])
     print('val_loss: %f, val_accuracy: %f' % (loss, accuracy))
 
@@ -141,6 +142,7 @@ def main():
     # ===========================================
     # ReEvaluation
     # ===========================================
+    # loss = os_elm.evaluate(x_test, t_test, metrics=['loss']
     [loss, accuracy] = os_elm.evaluate(x_test, t_test, metrics=['loss', 'accuracy'])
     print('val_loss: %f, val_accuracy: %f' % (loss, accuracy))
 
