@@ -23,7 +23,7 @@ def main(args):
         activation=args.activation,
     )
 
-    for batch_size in [4, 8, 16, 32, 64, 128, 256]:
+    for batch_size in [1, 4, 8, 16, 32, 64, 128, 256]:
         pbar = tqdm.tqdm(total=args.n, desc='Batchsize %d' % batch_size)
         times = []
         for i in range(args.n):

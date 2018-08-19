@@ -24,7 +24,7 @@ def main(args):
     )
 
     # sequential training phase
-    for batch_size in [4, 8, 16, 32, 64, 128, 256]:
+    for batch_size in [1, 4, 8, 16, 32, 64, 128, 256]:
         # initial training phase
         x = np.random.uniform(size=(2 * args.n_hidden_nodes, args.n_input_nodes))
         os_elm.init_train(x, x)
