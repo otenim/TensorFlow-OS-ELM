@@ -151,6 +151,8 @@ class NN(object):
             return tf.nn.sigmoid
         elif name == 'linear':
             return tf.identity
+        elif name == 'softmax':
+            return tf.nn.softmax
         else:
             raise ValueError(
                 'an unknown activation function \'%s\' was given. ' % (name)
