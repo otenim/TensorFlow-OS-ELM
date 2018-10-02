@@ -3,14 +3,14 @@
 ## Overview
 
 <div align="center">
-    <img src="https://i.imgur.com/GckJu86.png" width=600>
+    <img src="https://i.imgur.com/YdgQOlH.png" width=600>
 </div>
 
 In this repository, we provide a tensorflow implementation of Online Sequential
 Extreme Learning Machine (OS-ELM) introduced by Liang et al. in this [paper](http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=4012031).
-You can execute our OS-ELM module either on CPU or multiple GPUs.
+You can execute our OS-ELM module either on CPUs or GPUs.
 
-OS-ELM is known to be able to learn faster and the training will always
+OS-ELM is able to learn faster and training will always
 converge to the global optimal solution, while ordinary backpropagation-based
 neural networks have to deal with the local minima problem.
 
