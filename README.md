@@ -51,9 +51,9 @@ import tensorflow as tf
 import tqdm
 
 def softmax(a):
-    c = np.max(a, axis=-1)
+    c = np.max(a, axis=-1).reshape(-1, 1)
     exp_a = np.exp(a - c)
-    sum_exp_a = np.sum(exp_a, axis=-1)
+    sum_exp_a = np.sum(exp_a, axis=-1).reshape(-1, 1)
     return exp_a / sum_exp_a
 
 def main():
