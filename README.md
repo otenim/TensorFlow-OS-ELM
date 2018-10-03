@@ -147,7 +147,7 @@ def main():
     y = os_elm.predict(x)
     # apply softmax function to the output values.
     y = softmax(y)
-    print(y)
+    
     # check the answers.
     for i in range(n):
         max_ind = np.argmax(y[i])
