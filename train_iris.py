@@ -48,9 +48,7 @@ def main():
     iris = datasets.load_iris()
     x_iris, t_iris = iris.data, iris.target
 
-    # normalize each column value within [0, 1]
-    # x_iris -= np.min(x_iris, axis=0)
-    # x_iris /= np.max(x_iris, axis=0)
+    # normalize each column value
     mean = np.mean(x_iris, axis=0)
     std = np.std(x_iris, axis=0)
     x_iris = (x_iris - mean) / std
@@ -112,7 +110,7 @@ def main():
     y = os_elm.predict(x)
     # apply softmax function to the output values.
     y = softmax(y)
-    
+
     # check the answers.
     for i in range(n):
         max_ind = np.argmax(y[i])
