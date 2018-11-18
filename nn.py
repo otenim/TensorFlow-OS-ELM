@@ -118,7 +118,7 @@ class NN(object):
     def restore(self, filepath):
         self.__saver.restore(self.__sess, filepath)
 
-    def reset_variables(self):
+    def initialize_variables(self):
         for var in [self.__w1, self.__w2, self.__b1, self.__b2]:
             self.__sess.run(var.initializer)
 

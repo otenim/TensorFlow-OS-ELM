@@ -40,7 +40,7 @@ def main(args):
             times.append(etime - stime)
             pbar.update(1)
         pbar.close()
-        os_elm.reset_variables()
+        os_elm.initialize_variables()
         times = np.array(times)
         mean = np.mean(times)
         print('mean training time: %f [msec/batch]' % (1000*mean))
