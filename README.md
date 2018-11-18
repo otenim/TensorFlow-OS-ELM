@@ -3,14 +3,14 @@
 ## Overview
 
 <div align="center">
-    <img src="https://i.imgur.com/GckJu86.png" width=600>
+    <img src="https://i.imgur.com/YdgQOlH.png" width=600>
 </div>
 
 In this repository, we provide a tensorflow implementation of Online Sequential
-Extreme Machine (OS-ELM) introduced by Liang et al. in this [paper](http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=4012031).
-You can execute our OS-ELM module either on CPU or multiple GPUs.
+Extreme Learning Machine (OS-ELM) introduced by Liang et al. in this [paper](http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=4012031).
+You can execute our OS-ELM module either on CPUs or GPUs.
 
-OS-ELM is known to be able to learn faster and the training will always
+OS-ELM is able to learn faster and training will always
 converge to the global optimal solution, while ordinary backpropagation-based
 neural networks have to deal with the local minima problem.
 
@@ -26,10 +26,10 @@ We tested our codes by using the following libraries.
 
 We used Keras only for downloading the MNIST dataset.
 
-You don't have to used exactly the same version of the each library,
+You don't have to use exactly the same version of the each library,
 but we can not guarantee the codes work well in the case.
 
-All libraries above can be installed in the following command.
+All the above libraries can be installed in the following command.
 
 `$ pip install -U numpy Keras scikit-learn tensorflow`
 
@@ -50,6 +50,12 @@ import numpy as np
 import tensorflow as tf
 import tqdm
 
+def softmax(a):
+    c = np.max(a, axis=-1).reshape(-1, 1)
+    exp_a = np.exp(a - c)
+    sum_exp_a = np.sum(exp_a, axis=-1).reshape(-1, 1)
+    return exp_a / sum_exp_a
+
 def main():
 
     # ===========================================
@@ -69,12 +75,12 @@ def main():
         # loss function.
         # the default value is 'mean_squared_error'.
         # for the other functions, we support
-        # 'mean_absolute_error', 'categorical_crossentropy',
-        # and 'binary_crossentropy'.
+        # 'mean_absolute_error', 'categorical_crossentropy', and 'binary_crossentropy'.
         loss='mean_squared_error',
-        # activation function
+        # activation function applied to the hidden nodes.
         # the default value is 'sigmoid'.
-        # for the other functions, we support 'linear'.
+        # for the other functions, we support 'linear' and 'tanh'.
+        # NOTE: OS-ELM can apply an activation function only to the hidden nodes.
         activation='sigmoid',
     )
 
@@ -136,14 +142,18 @@ def main():
     n = 10
     x = x_test[:n]
     t = t_test[:n]
-    # If 'softmax' is True, softmax function is applied to the raw outputs,
-    # otherwise the raw outputs are returned as they are.
-    y = os_elm.predict(x, softmax=True)
+
+    # 'predict' method returns raw values of output nodes.
+    y = os_elm.predict(x)
+    # apply softmax function to the output values.
+    y = softmax(y)
+
     # check the answers.
     for i in range(n):
+        max_ind = np.argmax(y[i])
         print('========== sample index %d ==========' % i)
-        print('estimated answer: class %d' % np.argmax(y[i]))
-        print('estimated probability: %.3f' % np.max(y[i]))
+        print('estimated answer: class %d' % max_ind)
+        print('estimated probability: %.3f' % y[i,max_ind])
         print('true answer: class %d' % np.argmax(t[i]))
 
     # ===========================================
@@ -152,6 +162,7 @@ def main():
     # we currently support 'loss' and 'accuracy' for 'metrics'.
     # NOTE: 'accuracy' is valid only if the model assumes
     # to deal with a classification problem, while 'loss' is always valid.
+    # loss = os_elm.evaluate(x_test, t_test, metrics=['loss']
     [loss, accuracy] = os_elm.evaluate(x_test, t_test, metrics=['loss', 'accuracy'])
     print('val_loss: %f, val_accuracy: %f' % (loss, accuracy))
 
@@ -176,12 +187,12 @@ def main():
     # ===========================================
     # ReEvaluation
     # ===========================================
+    # loss = os_elm.evaluate(x_test, t_test, metrics=['loss']
     [loss, accuracy] = os_elm.evaluate(x_test, t_test, metrics=['loss', 'accuracy'])
     print('val_loss: %f, val_accuracy: %f' % (loss, accuracy))
 
 if __name__ == '__main__':
     main()
-
 ```
 
 ## Notes
@@ -192,16 +203,18 @@ The following figure shows OS-ELM training formula.
     <img src="https://i.imgur.com/QjqaMcS.png" width=600>
 </div>
 
-* Every training on OS-ELM will always converge to the global optimal solution.
+
+* **important**: Since matrix inversion in OS-ELM update formula has a lot of conditional operations, even if it is executed on GPUs, the training is not necessarily accelerated.
+* In OS-ELM, you can apply an activation function only to the hidden nodes.
+* OS-ELM always finds the global optimal solution for the weight matrices at every training.
 * If you feed all the training samples to OS-ELM in the initial training phase,
-the computational procedures will be exactly the same as ELM.
-So, we can consider ELM is a special case of OS-ELM.
+the computational procedures will be exactly the same as ELM. So, we can consider ELM is a special case of OS-ELM.
 * OS-ELM does not need to train iteratively on the same data samples,
 while backpropagation-based models usually need to do that.
 * OS-ELM does not update 'alpha', the weight matrix connecting the input nodes
 and the hidden nodes. It makes OS-ELM train faster.
 * OS-ELM does not need to compute gradients. The weight matrices are trained by
-computing some matrix multipies and a matrix inversion.
+computing some matrix products and a matrix inversion.
 * The computational complexity for the matrix inversion is about O(batch\_size^3),
 so take care for the cost when you increase batch\_size.
 
@@ -215,15 +228,4 @@ You can execute the above sample code with the following command.
 
 * support more activation functions
 * support more loss functions
-* provide benchmark results
-
-The following command is an example.
-
-`$ python train.py --n_hidden_nodes 512 --batch_size 32 --activation sigmoid --loss mean_squared_error`
-
-## Todos
-
-* support more activation functions
-* support more loss functions
-* provide GPU implementation using CuPy
 * provide benchmark results
