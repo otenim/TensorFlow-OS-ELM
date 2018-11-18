@@ -42,7 +42,7 @@ def main(args):
         pbar.close()
         os_elm.initialize_variables()
         times.sort()
-        times = times[:args.n // 2]
+        times = times[:args.n // 10]
         times = np.array(times)
         mean = np.mean(times)
         print('mean training time: %f [msec/batch]' % (1000*mean))
