@@ -37,6 +37,8 @@ def main(args):
             pbar.update(1)
         pbar.close()
         model.initialize_variables()
+        times.sort()
+        times = times[:args.n // 2]
         times = np.array(times)
         mean = np.mean(times)
         print('mean training time: %f [msec/batch]' % (1000*mean))

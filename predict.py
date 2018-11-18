@@ -35,6 +35,8 @@ def main(args):
             times.append(etime - stime)
             pbar.update(1)
         pbar.close()
+        times.sort()
+        times = times[:args.n // 2]
         times = np.array(times)
         mean = np.mean(times)
         print('mean prediction time: %f [msec/batch]' % (1000*mean))
