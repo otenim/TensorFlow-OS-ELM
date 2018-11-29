@@ -45,18 +45,16 @@ def main(args):
     # ========================================================
     # Training
     # ========================================================
-    times = []
+    s_time = time.time()
     for epoch in range(args.epochs):
         pbar = tqdm.tqdm(total=len(x_train_normal), desc='Epoch (%d/%d)' % (epoch+1, args.epochs))
         for i in range(0, len(x_train_normal), args.batch_size):
             x_batch = x_train_normal[i:i+args.batch_size]
-            s_time = time.time()
             model.train_on_batch(x_batch, x_batch)
-            e_time = time.time()
-            times.append(e_time - s_time)
             pbar.update(n=len(x_batch))
         pbar.close()
-    print('mean training time: %f [msec/batch]' % (1000. * np.mean(times)))
+    e_time = time.time()
+    print('training time: %f [sec]' % (e_time - s_time))
 
     # ========================================================
     # Evaluation (precision, recall, f-measure)
