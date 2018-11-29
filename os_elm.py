@@ -115,6 +115,7 @@ class OS_ELM(object):
                     'an unknown metric \'%s\' was given.' % m
                 )
         ret = self.__sess.run(met, feed_dict={self.__x: x, self.__t: t})
+        ret = list(map(lambda x: float(x), ret))
         return ret
 
     def init_train(self, x, t):
