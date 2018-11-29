@@ -4,18 +4,18 @@ import os
 import tqdm
 import datasets
 import time
+import random
 from os_elm import OS_ELM
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--batch_size',type=int,default=64)
 parser.add_argument('--n_hidden_nodes', type=int, default=32)
 parser.add_argument('--abnormal_ratio', type=float, default=0.1)
+parser.add_argument('--activation',choices=['sigmoid','linear'],default='linear')
 parser.add_argument('--loss',choices=[
     'mean_squared_error',
     'mean_absolute_error',
-    'softmax_cross_entropy'
 ],default='mean_absolute_error')
-parser.add_argument('--activation',choices=['sigmoid','linear'],default='linear')
 
 def main(args):
 
@@ -26,6 +26,9 @@ def main(args):
     dataset_normal = datasets.Mnist()
     (x_train_normal, _), (x_test_normal, _) = dataset_normal.load_data()
     (_, _), (x_test_abnormal, _) = dataset_abnormal.load_data()
+    x_train_normal = x_train_normal[np.random.permutation(len(x_train_normal))]
+    x_test_normal = x_test_normal[np.random.permutation(len(x_test_normal))]
+    x_test_abnormal = x_test_abnormal[np.random.permutation(len(x_test_abnormal))]
     border = int(1.2 * args.n_hidden_nodes)
     x_train_normal_init = x_train_normal[:border]
     x_train_normal_seq = x_train_normal[border:]
@@ -95,8 +98,8 @@ def main(args):
     losses = np.array(losses)
     losses = (losses - mean) / sigma
 
-    # compute precision, recall, f-measure for each k (1., 2., 3., 4., 5.)
-    ks = [1., 2., 3., 4., 5.]
+    # compute precision, recall, f-measure for each k
+    ks = [1., 2., 3., 4., 5., 6., 7., 8., 9., 10.]
     for k in ks:
         TP = np.sum(labels & (losses > k))
         precision = TP / np.sum(losses > k)

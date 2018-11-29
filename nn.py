@@ -95,7 +95,7 @@ class NN(object):
             self.__x: x,
             self.__t: t,
         })
-        return ret
+        return list(map(lambda x: float(x), ret))
 
     def __del__(self):
         self.__sess.close()
