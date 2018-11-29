@@ -8,6 +8,10 @@ from sklearn.decomposition import PCA
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--n_components', type=int, default=32)
+parser.add_argument('--loss', choices=[
+    'mean_squared_error',
+    'mean_absolute_error'
+],default='mean_absolute_error')
 
 def main(args):
 
@@ -22,6 +26,10 @@ def main(args):
     # ========================================================
     # Build model
     # ========================================================
+    if args.loss == 'mean_squared_error':
+        lossfun = lambda x, y: np.mean((x - y)**2)
+    else:
+        lossfun = lambda x, y: np.mean(np.abs(x - y))
     model = PCA(n_components=args.n_components)
 
     # ========================================================
@@ -48,8 +56,7 @@ def main(args):
         x = np.expand_dims(x, axis=0)
         h = model.transform(x)
         y = model.inverse_transform(h)
-        # loss = np.mean((x - y)**2)
-        loss = np.mean(np.abs(x - y))
+        loss = lossfun(x, y)
         losses.append(loss)
         pbar.update(n=1)
     losses = np.array(losses)
