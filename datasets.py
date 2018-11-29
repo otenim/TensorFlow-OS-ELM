@@ -20,6 +20,74 @@ class Mnist(object):
         y_test = to_categorical(y_test.astype(np.float32), self.num_classes)
         return (x_train, y_train), (x_test, y_test)
 
+class Mnist024(object):
+    def __init__(self):
+        self.type = 'classification'
+        self.num_classes = 10
+        self.inputs = 784
+        self.outputs = 10
+
+    def load_data(self):
+        (x_train, y_train), (x_test, y_test) = mnist.load_data()
+        X_train, Y_train = [], []
+        X_test, Y_test = [], []
+        for i in range(5):
+            target_ind = y_train == i
+            X_train.append(x_train[target_ind])
+            Y_train.append(y_train[target_ind])
+            target_ind = y_test == i
+            X_test.append(x_test[target_ind])
+            Y_test.append(y_test[target_ind])
+        X_train = np.concatenate(X_train, axis=0)
+        Y_train = np.concatenate(Y_train, axis=0)
+        X_test = np.concatenate(X_test, axis=0)
+        Y_test = np.concatenate(Y_test, axis=0)
+        X_train = X_train.astype(np.float32) / 255.
+        X_test = X_test.astype(np.float32) / 255.
+        X_train = X_train.reshape(-1,self.inputs)
+        X_test = X_test.reshape(-1,self.inputs)
+        Y_train = to_categorical(Y_train.astype(np.float32), self.num_classes)
+        Y_test = to_categorical(Y_test.astype(np.float32), self.num_classes)
+        perm = np.random.permutation(len(X_train))
+        X_train, Y_train = X_train[perm], Y_train[perm]
+        perm = np.random.permutation(len(X_test))
+        X_test, Y_test = X_test[perm], Y_test[perm]
+        return (X_train, Y_train), (X_test, Y_test)
+
+class Mnist529(object):
+    def __init__(self):
+        self.type = 'classification'
+        self.num_classes = 10
+        self.inputs = 784
+        self.outputs = 10
+
+    def load_data(self):
+        (x_train, y_train), (x_test, y_test) = mnist.load_data()
+        X_train, Y_train = [], []
+        X_test, Y_test = [], []
+        for i in range(5, 10):
+            target_ind = y_train == i
+            X_train.append(x_train[target_ind])
+            Y_train.append(y_train[target_ind])
+            target_ind = y_test == i
+            X_test.append(x_test[target_ind])
+            Y_test.append(y_test[target_ind])
+        X_train = np.concatenate(X_train, axis=0)
+        Y_train = np.concatenate(Y_train, axis=0)
+        X_test = np.concatenate(X_test, axis=0)
+        Y_test = np.concatenate(Y_test, axis=0)
+        X_train = X_train.astype(np.float32) / 255.
+        X_test = X_test.astype(np.float32) / 255.
+        X_train = X_train.reshape(-1,self.inputs)
+        X_test = X_test.reshape(-1,self.inputs)
+        Y_train = to_categorical(Y_train.astype(np.float32), self.num_classes)
+        Y_test = to_categorical(Y_test.astype(np.float32), self.num_classes)
+        perm = np.random.permutation(len(X_train))
+        X_train, Y_train = X_train[perm], Y_train[perm]
+        perm = np.random.permutation(len(X_test))
+        X_test, Y_test = X_test[perm], Y_test[perm]
+        return (X_train, Y_train), (X_test, Y_test)
+
 class Mnist_inv(object):
     def __init__(self):
         self.type = 'classification'
