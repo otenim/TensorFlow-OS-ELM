@@ -52,7 +52,7 @@ def main(args):
         loss = np.mean(np.abs(x - y))
         losses.append(loss)
         pbar.update(n=1)
-    losses = np.array(losses).flatten()
+    losses = np.array(losses)
     pbar.close()
 
     # normalize the loss values

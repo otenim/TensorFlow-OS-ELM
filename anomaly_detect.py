@@ -77,7 +77,7 @@ def main(args):
         [loss] = os_elm.evaluate(x, x, metrics=['loss'])
         losses.append(loss)
         pbar.update(n=1)
-    losses = np.array(losses).flatten()
+    losses = np.array(losses)
     pbar.close()
 
     # normalize the loss values

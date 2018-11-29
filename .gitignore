@@ -5,3 +5,4 @@ datasets/*
 results/*
 models/*
 *.pkl
+checkpoint/
