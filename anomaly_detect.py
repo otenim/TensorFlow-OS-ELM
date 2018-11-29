@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--batch_size',type=int,default=64)
 parser.add_argument('--n_hidden_nodes', type=int, default=32)
 parser.add_argument('--abnormal_ratio', type=float, default=0.1)
-parser.add_argument('--activation',choices=['sigmoid','linear'],default='linear')
+parser.add_argument('--activation',choices=['sigmoid','linear','tanh'],default='linear')
 parser.add_argument('--loss',choices=[
     'mean_squared_error',
     'mean_absolute_error',
