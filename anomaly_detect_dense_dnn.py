@@ -24,8 +24,9 @@ parser.add_argument('--output_activation', choices=[
 
 def convolutional_autoencoder(n_input_nodes, hidden_activation='relu', output_activation='sigmoid'):
     model = Sequential()
-    model = Sequential()
     model.add(Dense(128, activation=hidden_activation, input_shape=(n_input_nodes,)))
+    model.add(Dense(64, activation=hidden_activation))
+    model.add(Dense(32, activation=hidden_activation))
     model.add(Dense(64, activation=hidden_activation))
     model.add(Dense(128, activation=hidden_activation))
     model.add(Dense(n_input_nodes, activation=output_activation))
