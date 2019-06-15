@@ -6,4 +6,5 @@ results/*
 models/*
 checkpoint/
 .vscode/
+images/
 *.pkl
