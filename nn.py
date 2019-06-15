@@ -98,6 +98,7 @@ class NN(object):
         return list(map(lambda x: float(x), ret))
 
     def __del__(self):
+        tf.reset_default_graph()
         self.__sess.close()
 
     @property

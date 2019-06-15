@@ -179,6 +179,7 @@ class OS_ELM(object):
             self.__sess.run(var.initializer)
 
     def __del__(self):
+        tf.reset_default_graph()
         self.__sess.close()
 
     @property
