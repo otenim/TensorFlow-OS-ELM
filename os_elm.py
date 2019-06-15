@@ -168,6 +168,7 @@ class OS_ELM(object):
         return seq_train
 
     def save(self, filepath):
+        tf.reset_default_graph()
         self.__saver.save(self.__sess, filepath)
 
     def restore(self, filepath):
