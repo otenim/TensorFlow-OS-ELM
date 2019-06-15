@@ -5,4 +5,5 @@ datasets/*
 results/*
 models/*
 checkpoint/
+.vscode/
 *.pkl
