@@ -155,7 +155,6 @@ class OS_ELM(object):
     def __build_seq_train_graph(self):
         H = self.__activation(tf.matmul(self.__x, self.__alpha) + self.__bias)
         HT = tf.transpose(H)
-        HTH = tf.matmul(HT, H)
         batch_size = tf.shape(self.__x)[0]
         I = tf.eye(batch_size)
         Hp = tf.matmul(H, self.__p)
