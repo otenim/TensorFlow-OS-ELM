@@ -22,9 +22,21 @@ def main(args):
 
     dataset = datasets.Mnist()
     (x_train, t_train), (x_test, t_test) = dataset.load_data()
+
+    # ========================================================
+    # Build model
+    # ========================================================
+    os_elm = OS_ELM(
+            dataset.inputs,
+            args.num_units,
+            dataset.inputs,
+            loss=args.loss,
+            activation=args.activation,
+    )
+
     for class_id in range(dataset.num_classes):
         # ========================================================
-        # Prepare Dataset
+        # Prepare dataset
         # ========================================================
         normal_train = x_train[t_train == class_id]
         normal_test = x_test[t_test == class_id]
@@ -34,17 +46,6 @@ def main(args):
         normal_seq_train = normal_train[border:]
         test = np.concatenate((normal_test, anomaly_test), axis=0)
         test_labels = np.concatenate(([0] * len(normal_test), [1] * len(anomaly_test)), axis=0)
-
-        # ========================================================
-        # Build model
-        # ========================================================
-        os_elm = OS_ELM(
-            dataset.inputs,
-            args.num_units,
-            dataset.inputs,
-            loss=args.loss,
-            activation=args.activation,
-        )
 
         # ========================================================
         # Initial training phase
@@ -65,12 +66,14 @@ def main(args):
         scores = []
         for i in range(len(test)):
             x = np.expand_dims(test[i], axis=0)
-            score = os_elm.evaluate(x, x)
+            score = os_elm.evaluate(x, x)[0]
             scores.append(score)
         scores = np.array(scores)
         auc = roc_auc_score(test_labels, scores)
         print('%d: %f' % (class_id, auc))
-        del os_elm
+
+        # reset
+        os_elm.initialize_variables()
 
 if __name__ == '__main__':
     args = parser.parse_args()
