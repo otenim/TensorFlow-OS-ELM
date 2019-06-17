@@ -16,7 +16,8 @@ parser.add_argument('--loss',choices=[
     'mean_squared_error',
     'mean_absolute_error',
 ],default='mean_squared_error')
-parser.add_argument('--bsize',type=int,default=64)
+parser.add_argument('--bsize', type=int,default=64)
+parser.add_argument('--anomaly_ratio', type=float, default=0.2)
 
 def main(args):
 
@@ -41,6 +42,8 @@ def main(args):
         normal_train = x_train[t_train == class_id]
         normal_test = x_test[t_test == class_id]
         anomaly_test = x_test[t_test != class_id]
+        border = int(len(normal_test) / (1 / args.anomaly_ratio - 1))
+        anomaly_test = x_test[:border]
         border = int(1.2 * args.num_units)
         normal_ini_train = normal_train[:border]
         normal_seq_train = normal_train[border:]

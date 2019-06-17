@@ -20,6 +20,7 @@ parser.add_argument('--loss', choices=[
 parser.add_argument('--opt', choices=['adam', 'sgd'], default='adam')
 parser.add_argument('--bsize', type=int, default=64)
 parser.add_argument('--epochs', type=int, default=10)
+parser.add_argument('--anomaly_ratio', type=float, default=0.2)
 
 def main(args):
 
@@ -46,6 +47,8 @@ def main(args):
         normal_train = x_train[t_train == class_id]
         normal_test = x_test[t_test == class_id]
         anomaly_test = x_test[t_test != class_id]
+        border = int(len(normal_test) / (1 / args.anomaly_ratio - 1))
+        anomaly_test = x_test[:border]
         test = np.concatenate((normal_test, anomaly_test), axis=0)
         test_labels = np.concatenate(([0] * len(normal_test), [1] * len(anomaly_test)), axis=0)
 
